@@ -10,7 +10,7 @@ public class LaserAmmo : Ammo {
     private     Vector3         destination;
     private     LineRenderer    line;
 
-    public void initialize(Vector3 direction)
+    public void initialize(Vector3 direction, bool isServer)
     {
         damage = 15.0f;
 
@@ -21,6 +21,9 @@ public class LaserAmmo : Ammo {
         line.SetPosition(0, origin);
         line.SetPosition(1, destination);
 
+        if (!isServer)
+            return;
+
         RaycastHit hit;
         if (Physics.Raycast(origin, destination - origin, out hit))
         {
@@ -28,7 +31,7 @@ public class LaserAmmo : Ammo {
             if (target != null)
             {
                 Debug.Log(maxRadius);
-                target.ReceiveDamage(damage);
+                target.InflictDamage(damage);
             }
         }
     }

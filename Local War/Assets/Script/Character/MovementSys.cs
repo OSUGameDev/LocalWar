@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class MovementSys : MonoBehaviour {
+public class MovementSys : NetworkBehaviour {
 
     private float speed = 2.0F;          //the moving speed of the character
     private float jumpSpeed = 10.0f;      //the jump force of the character
@@ -78,10 +79,12 @@ public class MovementSys : MonoBehaviour {
         mouseY = 0;
 
         controller = GetComponent<CharacterController>();
+        transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
     }
 
     void Update()
     {
-        move();
+        if(hasAuthority)
+            move();
     }
 }
