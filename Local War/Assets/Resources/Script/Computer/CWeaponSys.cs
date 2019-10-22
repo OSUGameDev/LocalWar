@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class WeaponSys : NetworkBehaviour {
+public class CWeaponSys : MonoBehaviour {
 
     private     int         currentWeaponPos;
-    private     Camera      playerCam;
     private     GameObject  weaponList;
     private     GameObject  currentWeapon;
 
@@ -34,7 +32,6 @@ public class WeaponSys : NetworkBehaviour {
     void Start ()
     {
         //Initialize the objects
-        playerCam = transform.Find("Main Camera").GetComponent<Camera>();
         weaponList = transform.Find("Weapons").gameObject;
 
         //Initialize the weapon
@@ -45,28 +42,6 @@ public class WeaponSys : NetworkBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (Input.GetButton("Fire1"))
-        {
-            CmdFire();
 
-        }
     }
-
-    [Command]
-    void CmdFire()
-    {
-        RpcFire();
-    }
-
-    [ClientRpc]
-    void RpcFire()
-    {
-        //Get the access to the target
-        RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
-
-        //Set the camera then perform attack
-        script.SetCamera(playerCam);
-        script.Fire(isServer);
-    }
-
 }

@@ -19,7 +19,10 @@ public class LifeSys : NetworkBehaviour {
         private set {
             _health = value;
             if (_health <= 0)
-                RpcDie();
+            {
+                RpcDeactivate();
+                Spawn(100, 100);
+            }
             DirtyBits = DirtyBits | 0x00000001;
         }
     }
@@ -54,9 +57,22 @@ public class LifeSys : NetworkBehaviour {
     //private List<Debuff>    debuffList;
 
     [ClientRpc]
-    public void RpcDie()
+    public void RpcDeactivate()
     {
-        gameObject.SetActive(false); 
+        gameObject.SetActive(false);
+    }
+
+    [ClientRpc]
+    public void RpcActivate()
+    {
+        gameObject.SetActive(true);
+    }
+
+    protected void RpcSpawn()
+    {
+        gameObject.SetActive(true);
+        if (hasAuthority)
+            transform.position = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.position;
     }
 
     [ClientRpc]
@@ -79,6 +95,14 @@ public class LifeSys : NetworkBehaviour {
         {
             health -= dmg;
         }
+    }
+
+    [Server]
+    public void Spawn(int health = 100, int shield = 100)
+    {
+        _health = health;
+        _shield = shield;
+        RpcActivate();
     }
 
 	// Use this for initialization
