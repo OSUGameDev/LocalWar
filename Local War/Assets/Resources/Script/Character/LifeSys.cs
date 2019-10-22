@@ -21,7 +21,7 @@ public class LifeSys : MonoBehaviour {
 
     public void Die()
     {
-        gameObject.SetActive(false); 
+        Destroy(gameObject);
     }
 
     public void ReceiveDamage(float dmg)
