@@ -1,12 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class LifeSys : NetworkBehaviour {
+public class LifeSys : NetworkBehaviour, ISpawnable {
 
-
-    private uint DirtyBits;
+    public static LifeSys playerLifeSystem;
+    public TimeSpan respawnTime = new TimeSpan(0, 0, 10);
 
     /// <summary>
     /// Health of the entity
@@ -20,15 +21,17 @@ public class LifeSys : NetworkBehaviour {
             _health = value;
             if (_health <= 0)
             {
-                RpcDeactivate();
-                Spawn(100, 100);
+                _health = 0;
+                if(isServer)
+                    Kill();
             }
-            DirtyBits = DirtyBits | 0x00000001;
         }
     }
+    
     /// <summary>
     /// Backend field for the <see cref="Health"/> property
     /// </summary>
+    [SyncVar]
     private float           _health;
 
     /// <summary>
@@ -43,50 +46,72 @@ public class LifeSys : NetworkBehaviour {
             _shield = value;
             if (_shield <= 0)
                 _shield = 0;
-            DirtyBits = DirtyBits | 0x00000002;
         }
     }
 
     /// <summary>
     /// Backend field for the <see cref="shield"/> property
     /// </summary>
+    [SyncVar]
     private float _shield;
 
+    public DateTime nextSpawnTime;
 
     //private List<Buff>      buffList;
     //private List<Debuff>    debuffList;
 
+
     [ClientRpc]
-    public void RpcDeactivate()
+    private void RpcKill()
+    {
+        nextSpawnTime = DateTime.Now + respawnTime;
+        gameObject.SetActive(false);
+        if(hasAuthority)
+        {
+            GameObject.Find("RespawnCamera").GetComponent<Camera>().enabled = true;
+        }
+    }
+
+    [ClientRpc]
+    private void RpcActivate()
+    {
+        gameObject.SetActive(true);
+    }
+
+    [ClientRpc]
+    private void RpcSpawn()
+    {
+        if (hasAuthority)
+        {
+            transform.position = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.position;
+            transform.rotation = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.rotation;
+            GameObject.Find("RespawnCamera").GetComponent<Camera>().enabled = false;
+        }
+        gameObject.SetActive(true);
+    }
+
+    [ClientRpc]
+    private void RpcClientDamaged(float dmg)
+    {
+    }
+
+    [ClientRpc]
+    private void RpcSetRespawnTime(long binaryTime)
+    {
+    }
+
+    [Server]
+    public void Kill()
     {
         gameObject.SetActive(false);
+        RpcKill();
+        RespawnManager.singleton.QueueRespawn(respawnTime, this);
     }
-
-    [ClientRpc]
-    public void RpcActivate()
-    {
-        gameObject.SetActive(true);
-    }
-
-    protected void RpcSpawn()
-    {
-        gameObject.SetActive(true);
-        if (hasAuthority)
-            transform.position = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.position;
-    }
-
-    [ClientRpc]
-    public void RpcClientDamaged(float dmg)
-    {
-        Debug.Log("Receive damage! " + dmg);
-    }
-
 
     [Server]
     public void InflictDamage(float dmg)
     {
         RpcClientDamaged(dmg);
-        Debug.Log("Client "+netId+" recieved "+ dmg + " damage!");
         if (shield > 0)
         {
             shield -= dmg;
@@ -98,37 +123,26 @@ public class LifeSys : NetworkBehaviour {
     }
 
     [Server]
-    public void Spawn(int health = 100, int shield = 100)
+    public void Spawn(int health, int shield)
     {
         _health = health;
         _shield = shield;
-        RpcActivate();
+        RpcSpawn();
     }
 
-	// Use this for initialization
-	void Start () {
-        health = 100.0f;
-        shield = 100.0f;
-	}
-	
-	// Update is called once per frame
+    [Server]
+    public void Spawn()
+    {
+        Spawn(100, 100);
+    }
+
+    void Start () {
+        _health = 100.0f;
+        _shield = 100.0f;
+        if (hasAuthority)
+            playerLifeSystem = this;
+    }
+
 	void Update () {
-		
 	}
-
-    public override System.Boolean OnSerialize(NetworkWriter writer, System.Boolean initialState)
-    {
-        if (!initialState && DirtyBits == 0)
-            return false;
-        writer.Write(health);
-        writer.Write(shield);
-        return true;
-    }
-
-    public override void OnDeserialize(NetworkReader reader, System.Boolean initialState)
-    {
-        _health = reader.ReadSingle();
-        _shield = reader.ReadSingle();
-    }
-
 }
