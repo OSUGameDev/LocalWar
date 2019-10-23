@@ -75,4 +75,9 @@ public class MainMenu : MonoBehaviour {
         NetworkManager.GetComponent<NetworkManager>().StartHost();
     }
 
+    public void QuitApplication()
+    {
+        Application.Quit();
+    }
+
 }
