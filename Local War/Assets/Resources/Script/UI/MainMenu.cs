@@ -8,11 +8,21 @@ public class MainMenu : MonoBehaviour {
 
     public GameObject CurrentMenu;
     public List<GameObject> Menus = new List<GameObject>();
-    public NetworkManager NetworkManager;
+    public GameObject NetworkManagerPrefab;
+    private GameObject NetworkManager;
 
 	// Use this for initialization
 	void Start () {
         MenuStack = new Stack<GameObject>();
+        NetworkManager = GameObject.FindGameObjectWithTag("NetworkManager");
+        if(NetworkManager != null)
+        {
+            DestroyImmediate(NetworkManager);
+        }
+        NetworkManager = Instantiate(NetworkManagerPrefab);
+        DontDestroyOnLoad(NetworkManager);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 	
 	// Update is called once per frame
@@ -48,21 +58,26 @@ public class MainMenu : MonoBehaviour {
         string text = GameObject.Find("IPInputField").GetComponent<InputField>().text;
         Debug.Log("Connecting to server: " + text);
         
-        NetworkManager.networkAddress = text;
-        NetworkManager.StartClient();
+        NetworkManager.GetComponent<NetworkManager>().networkAddress = text;
+        NetworkManager.GetComponent<NetworkManager>().StartClient();
     }
 
     public void ConnectToLocalHost()
     {
-        NetworkManager.networkAddress = "127.0.0.1";
-        NetworkManager.StartClient();
+        NetworkManager.GetComponent<NetworkManager>().networkAddress = "127.0.0.1";
+        NetworkManager.GetComponent<NetworkManager>().StartClient();
     }
 
 
     public void HostServer()
     {
         Debug.Log("Hosting Server");
-        NetworkManager.StartHost();
+        NetworkManager.GetComponent<NetworkManager>().StartHost();
+    }
+
+    public void QuitApplication()
+    {
+        Application.Quit();
     }
 
 }

@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class MovementSys : NetworkBehaviour {
+public class CMovementSys : MonoBehaviour {
 
     private float speed = 2.0F;          //the moving speed of the character
     private float jumpSpeed = 10.0f;      //the jump force of the character
@@ -41,50 +40,23 @@ public class MovementSys : NetworkBehaviour {
 
     private void move()
     {
-        /*****Get basic player input*****/
-        moveH = Input.GetAxis("Horizontal");
-        moveV = Input.GetAxis("Vertical");
-        mouseX += Input.GetAxis("Mouse X") * rotateSpeed * Time.deltaTime;
-        mouseY -= Input.GetAxis("Mouse Y") * rotateSpeed * Time.deltaTime;
-        mouseY = Mathf.Clamp(mouseY, -90, 90);
-
-        rotationStart = transform.rotation;
-        rotationEnd = Quaternion.Euler(mouseY, mouseX, 0f);
-        transform.rotation = Quaternion.Lerp(rotationStart, rotationEnd, 0.5f);
-
-        moveDirection = new Vector3(moveH, 0.0f, moveV);       //Create the player's movement from keyboard in local space
-        moveDirection = transform.TransformDirection(moveDirection);      //Transform the moveMent from local space to world space
-        moveDirection *= speed;      //Based on base speed
-
-        /*****Check jump mode at last*****/
-        if (Input.GetButtonDown("Jump"))               //jump if the character is grounded and the user presses the jump button.
-        {
-            jumpDirection.y = jumpSpeed;     //Give a jump speed to player
-        }
-
-
         /*****Move the player*****/
         controller.Move(moveDirection * Time.deltaTime);    //move the character based on the gravitational force.
         if (!controller.isGrounded)
-        {
             jumpDirection.y -= gravity * Time.deltaTime;
-        }
+        else
+            jumpDirection.y = 0;
         controller.Move(jumpDirection * Time.deltaTime);
     }
 
     //This built-in function will be called after the script first time loaded into the scene
     void Start()
     {
-        mouseX = 0;
-        mouseY = 0;
-
         controller = GetComponent<CharacterController>();
-        transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
     }
 
     void Update()
     {
-        if(hasAuthority)
-            move();
+        move();
     }
 }
