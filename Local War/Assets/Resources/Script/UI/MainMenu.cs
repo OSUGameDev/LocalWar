@@ -23,6 +23,13 @@ public class MainMenu : MonoBehaviour {
         DontDestroyOnLoad(NetworkManager);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        if(Application.isBatchMode)
+        {
+            Application.targetFrameRate = 30;
+            NetworkManager.GetComponent<NetworkManager>().StartServer();
+        }
+
     }
 	
 	// Update is called once per frame
