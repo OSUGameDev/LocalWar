@@ -9,27 +9,28 @@ public class MeshGenerator : MonoBehaviour
     // Constant variables, edit to change effects
 
     // City Map stuff
-    const int citySize = 3;                                        // Number of blocks in city
+    const int citySize = 15;                                        // Number of blocks in city
     const int blockSize = 5;                                        // Number of building locations per block
-    const int buildMaxSize = 3;                                     // Max size of a building in X or Z dimension
+    const int buildMaxSize = 5;                                     // Max size of a building in X or Z dimension
+    const int roadSize = 1;
 
     // Spacing for buildings
     const float buildingSpacing = .2f;                              // Empty space around buildings, min 0 max .49
     const float buildingThickness = .05f;                           // Wall thickness
 
     // Building height stuff
-    const float baseHeight = 2f;                                    // Mininum building height
-    const float baseRange = 3f;                                     // Range above minimum building height
+    const float baseHeight = 3f;                                    // Mininum building height
+    const float baseRange = 2f;                                     // Range above minimum building height
     const float extraTallBuildings = 0.01f;                         // Adds a % chance of a building to be extraHeight taller
     const float extraHeight = 10.0f;                                // Extra height in case of building being taller
 
     // Building / Ground Noise
-    bool groundNoise = false;                                        // Change to add noise to ground level, also raises ground slightly, not reccommended but fun
-    bool buildingHeightNoise = false;                               // Adds noise to building height, also increases building height, dependent on citySize
+    bool groundNoise = true;                                        // Change to add noise to ground level, also raises ground slightly, not reccommended but fun
+    bool buildingHeightNoise = true;                               // Adds noise to building height, also increases building height, dependent on citySize
 
     // Derived constants, do not edit
-    const int xSize = blockSize * citySize + citySize - 1;          // Mesh size in X
-    const int zSize = blockSize * citySize + citySize - 1;          // Mesh size in Y
+    const int xSize = (blockSize * citySize) + (citySize * roadSize) - (roadSize);          // Mesh size in X
+    const int zSize = (blockSize * citySize) + (citySize * roadSize) - (roadSize);          // Mesh size in Y
     const int mapScale = 1;                                         // This is not implemented correctly yet and can break certain things if not 1
     const float buildN = ((float)citySize * (float)citySize * (float)blockSize) / (2.0f * (float)citySize + (float)blockSize);
 
@@ -56,7 +57,7 @@ public class MeshGenerator : MonoBehaviour
         {
             for (int k = 0; k < citySize; k++)
             {
-                BuildingGeneration((blockSize * i) + i, (blockSize * k) + k);
+                BuildingGeneration((blockSize * i) + i * roadSize, (blockSize * k) + k * roadSize);
             }
         }
     }
@@ -139,15 +140,10 @@ public class MeshGenerator : MonoBehaviour
                     BuildWall(xMid, buildingHeight, zMid, buildingX, buildingThickness, buildingZ);
 
                     // Randomize next building size
-                    buildingSize[0] = Random.Range(1, buildMaxSize + 1);
-                    buildingSize[1] = Random.Range(1, buildMaxSize + 1);
+                    buildingSize[0] = Random.Range(2, buildMaxSize + 1);
+                    buildingSize[1] = Random.Range(2, buildMaxSize + 1);
 
                     // Extra randomize logic to avoid min or max size buildings as much as possible
-                    if (buildingSize[1] == 1 && buildingSize[0] == 1 || buildingSize[1] == buildMaxSize && buildingSize[0] == buildMaxSize)
-                    {
-                        buildingSize[1] = Random.Range(1, buildMaxSize + 1);
-                        buildingSize[0] = Random.Range(1, buildMaxSize + 1);
-                    }
                     if ((buildingSize[0] + i) >= blockSize)
                     {
                         buildingSize[0] = 1;
@@ -166,11 +162,12 @@ public class MeshGenerator : MonoBehaviour
     // Creates a wall at (x, y, z) position with (x, y, z) scale.
     void BuildWall(float px, float py, float pz, float sx, float sy, float sz)
     {
-        Material newMat = Resources.Load("Art/Material/Pure Color/Green", typeof(Material)) as Material;
+        Material newMat = Resources.Load("Art/Material/Brick", typeof(Material)) as Material;
         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         cube.transform.position = new Vector3(px, py, pz);
         cube.transform.localScale = new Vector3(sx, sy, sz);
         cube.GetComponent<MeshRenderer>().material = newMat;
+        cube.AddComponent<ReCalcCubeTexture>();
     }
 
     void CreateShape()
