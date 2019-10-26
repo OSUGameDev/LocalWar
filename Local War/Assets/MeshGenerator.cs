@@ -19,8 +19,8 @@ public class MeshGenerator : MonoBehaviour
     const float buildingThickness = .05f;                           // Wall thickness
 
     // Building height stuff
-    const float baseHeight = 3f;                                    // Mininum building height
-    const float baseRange = 2f;                                     // Range above minimum building height
+    const float baseHeight = 2f;                                    // Mininum building height
+    const float baseRange = 3f;                                     // Range above minimum building height
     const float extraTallBuildings = 0.01f;                         // Adds a % chance of a building to be extraHeight taller
     const float extraHeight = 10.0f;                                // Extra height in case of building being taller
 
@@ -29,10 +29,13 @@ public class MeshGenerator : MonoBehaviour
     bool buildingHeightNoise = true;                               // Adds noise to building height, also increases building height, dependent on citySize
 
     // Derived constants, do not edit
-    const int xSize = (blockSize * citySize) + (citySize * roadSize) - (roadSize);          // Mesh size in X
-    const int zSize = (blockSize * citySize) + (citySize * roadSize) - (roadSize);          // Mesh size in Y
+    const int xSize = (blockSize * citySize) + (citySize * roadSize) + (roadSize);          // Mesh size in X
+    const int zSize = (blockSize * citySize) + (citySize * roadSize) + (roadSize);          // Mesh size in Y
     const int mapScale = 1;                                         // This is not implemented correctly yet and can break certain things if not 1
-    const float buildN = ((float)citySize * (float)citySize * (float)blockSize) / (2.0f * (float)citySize + (float)blockSize);
+
+    // Perlin noise changes
+    readonly float refinement = 0.02f;
+    readonly float buildN = 40f;
 
     // Other variables
     Mesh mesh;
@@ -44,6 +47,8 @@ public class MeshGenerator : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+
+        Random.InitState(42);
 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
@@ -57,7 +62,7 @@ public class MeshGenerator : MonoBehaviour
         {
             for (int k = 0; k < citySize; k++)
             {
-                BuildingGeneration((blockSize * i) + i * roadSize, (blockSize * k) + k * roadSize);
+                BuildingGeneration((blockSize * i) + (i * roadSize) + roadSize, (blockSize * k) + (k * roadSize) + roadSize);
             }
         }
     }
@@ -68,8 +73,8 @@ public class MeshGenerator : MonoBehaviour
         float xStart = x;
         float zStart = z;
         int[] buildingSize = {
-            Random.Range(1,buildMaxSize+1),
-            Random.Range(1,buildMaxSize+1)
+            Random.Range(2,buildMaxSize+1),
+            Random.Range(2,buildMaxSize+1)
         };
 
         // For debugging only, can delete later
@@ -109,7 +114,7 @@ public class MeshGenerator : MonoBehaviour
                     float buildingHeight = Random.Range(baseHeight, baseHeight + baseRange);
                     if (buildingHeightNoise == true)
                     {
-                        buildingHeight += Mathf.PerlinNoise(x1 * 1.0f / buildN, z1 * 1.0f / buildN) * buildN;
+                        buildingHeight += Mathf.PerlinNoise(x1 * refinement, z1 * refinement) * buildN;
                     }
                     float tallB = Random.Range(0f, 1f);
                     if (tallB < extraTallBuildings)
@@ -147,10 +152,22 @@ public class MeshGenerator : MonoBehaviour
                     if ((buildingSize[0] + i) >= blockSize)
                     {
                         buildingSize[0] = 1;
+                        Debug.Log("Set to 1");
                     }
                     if ((buildingSize[1] + k) >= blockSize)
                     {
                         buildingSize[1] = 1;
+                        Debug.Log("Set to 1");
+                    }
+                    if ((buildingSize[0] + i + 1) == blockSize && buildingSize[0] <= buildMaxSize)
+                    {
+                        buildingSize[0] += 1;
+                        Debug.Log(buildingSize[0]);
+                    }
+                    if ((buildingSize[1] + i + 1) == blockSize && buildingSize[1] <= buildMaxSize)
+                    {
+                        buildingSize[1] += 1;
+                        Debug.Log(buildingSize[1]);
                     }
                 }
             }
@@ -183,7 +200,7 @@ public class MeshGenerator : MonoBehaviour
 
                 if (groundNoise)
                 {
-                    y = Mathf.PerlinNoise(x * 1.0f / buildN, z * 1.0f / buildN) * buildN - 1;
+                    y = Mathf.PerlinNoise(x * refinement, z * refinement) * buildN - 1;
                 }
                 else
                 {
