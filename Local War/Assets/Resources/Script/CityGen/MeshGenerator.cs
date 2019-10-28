@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class MeshGenerator : MonoBehaviour
+public class MeshGenerator : NetworkBehaviour
 {
 
     // Constant variables, edit to change effects
@@ -32,7 +32,8 @@ public class MeshGenerator : MonoBehaviour
     readonly float magnitude = 40f;                                 // Changes the magnitude, lower numbers = flatter terrain
 
     // Random seed for level generation
-    readonly int seed = 1;
+    [SyncVar]
+    public int seed = 1;
 
     // Derived constants, DO NOT EDIT
     const int xSize = (blockSize * citySize) + (citySize * roadSize) + (roadSize);          // Mesh size in X
@@ -50,9 +51,16 @@ public class MeshGenerator : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        if (isServer)
+            this.seed = Random.Range(int.MinValue, int.MaxValue);
+        GenerateMap();
 
+    }
+
+
+    public void GenerateMap()
+    {
         Random.InitState(seed);
-
         x_offset = Random.Range(0, 2);
         z_offset = Random.Range(0, 2);
 
