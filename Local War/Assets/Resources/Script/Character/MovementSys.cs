@@ -9,7 +9,7 @@ public class MovementSys : NetworkBehaviour {
     private float jumpSpeed = 10.0f;      //the jump force of the character
     private float rotateSpeed = 100.0f;
 
-    private float gravity = 20.0f;       //the force of gravity on the character
+    private float gravity = 9.0f;       //the force of gravity on the character
 
     private float groundOffset = .2f;    //the offset for the IsGrounded check. Useful for recognizing slopes and imperfect ground.
 
@@ -20,6 +20,8 @@ public class MovementSys : NetworkBehaviour {
     private Quaternion rotationStart, rotationEnd;
 
     private CharacterController controller;
+    private GameObject head;
+
 
 
     ///The check to see if the character is currently on the ground.
@@ -48,9 +50,16 @@ public class MovementSys : NetworkBehaviour {
         mouseY -= Input.GetAxis("Mouse Y") * rotateSpeed * Time.deltaTime;
         mouseY = Mathf.Clamp(mouseY, -90, 90);
 
+        //Rotate whole body based on Y axis
         rotationStart = transform.rotation;
-        rotationEnd = Quaternion.Euler(mouseY, mouseX, 0f);
+        rotationEnd = Quaternion.Euler(0f, mouseX, 0f);
         transform.rotation = Quaternion.Lerp(rotationStart, rotationEnd, 0.5f);
+
+        //Rotate the head on all axis
+        rotationStart = head.transform.rotation;
+        rotationEnd = Quaternion.Euler(mouseY, mouseX, 0f);
+        head.transform.rotation = Quaternion.Lerp(rotationStart, rotationEnd, 0.5f);
+
 
         moveDirection = new Vector3(moveH, 0.0f, moveV);       //Create the player's movement from keyboard in local space
         moveDirection = transform.TransformDirection(moveDirection);      //Transform the moveMent from local space to world space
@@ -66,10 +75,11 @@ public class MovementSys : NetworkBehaviour {
         /*****Move the player*****/
         controller.Move(moveDirection * Time.deltaTime);    //move the character based on the gravitational force.
         if (!controller.isGrounded)
-        {
             jumpDirection.y -= gravity * Time.deltaTime;
-        }
+
         controller.Move(jumpDirection * Time.deltaTime);
+        if(controller.isGrounded)
+            jumpDirection.y = 0;
     }
 
     //This built-in function will be called after the script first time loaded into the scene
@@ -79,7 +89,8 @@ public class MovementSys : NetworkBehaviour {
         mouseY = 0;
 
         controller = GetComponent<CharacterController>();
-        transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
+        head = transform.Find("Head").gameObject;
+        head.transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
         if (hasAuthority)
         {
             Cursor.lockState = CursorLockMode.Locked;
