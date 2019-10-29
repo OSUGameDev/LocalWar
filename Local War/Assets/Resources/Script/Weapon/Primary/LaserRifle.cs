@@ -1,14 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class LaserRifle : RangeWeapon {
 
     private float accuracy;
     private bool isCharging;
     private Vector2[] uiPos;
-    protected GameObject playerUI;
-    public GameObject laserRifleUI;
 
     private void StoreUIPos()
     {
@@ -17,7 +16,7 @@ public class LaserRifle : RangeWeapon {
         //Store the initial position
         for (int i = 0; i < 4; i++)
         {
-            RectTransform current = laserRifleUI.transform.GetChild(i).GetComponent<RectTransform>();
+            RectTransform current = customUIInstance.transform.GetChild(i).GetComponent<RectTransform>();
             float x = current.anchoredPosition.x;
             float y = current.anchoredPosition.y;
             uiPos[i] = new Vector2(x, y);
@@ -28,7 +27,7 @@ public class LaserRifle : RangeWeapon {
     {
         for (int i = 0; i < 4; i++)
         {
-            RectTransform current = laserRifleUI.transform.GetChild(i).GetComponent<RectTransform>();
+            RectTransform current = customUIInstance.transform.GetChild(i).GetComponent<RectTransform>();
             float x = current.anchoredPosition.x * 0.995f;
             float y = current.anchoredPosition.y * 0.995f;
             current.anchoredPosition = new Vector2(x, y);
@@ -39,47 +38,50 @@ public class LaserRifle : RangeWeapon {
     {
         for (int i = 0; i < 4; i++)
         {
-            RectTransform current = laserRifleUI.transform.GetChild(i).GetComponent<RectTransform>();
+            RectTransform current = customUIInstance.transform.GetChild(i).GetComponent<RectTransform>();
             float x = current.anchoredPosition.x;
             float y = current.anchoredPosition.y;
             current.anchoredPosition = uiPos[i];
         }
-    }
+    } 
 
     public override void Fire(bool isServer)
     {
         //If the ray hit something
         if (!isShooting && isServer)
         {
-            Debug.Log("Trigger!");
             isShooting = true;
             isCharging = true;
         }
     }
 
-    // Use this for initialization
-    void Start () {
-        //Get the main UI canvas
-        playerUI = GameObject.Find("PlayerUI");
-        //Instantiate the custom UI 
-        laserRifleUI = Instantiate(laserRifleUI);
-        //Append the UI to the main UI canvas
-        laserRifleUI.transform.parent = transform;
+    public override GameObject CustomUI()
+    {
+        //Create UI instance
+        customUIInstance = Instantiate(customUI);
+        customUIInstance.SetActive(false);
+        StoreUIPos();
+        Debug.Log(customUIInstance);
+        return base.CustomUI();
+    }
 
+    // Use this for initialization
+    void Start ()
+    {
         //Initialize the accuracy
         accuracy = 0.4f;
         coolDown = 2.0f;
         isCharging = false;
-        StoreUIPos();
     }
 	
 	// Update is called once per frame
 	void Update () {
+        Debug.Log(customUIInstance);
+
         //Debug.Log(Input.GetMouseButton(0));
         if (isCharging && Input.GetButton("Fire1"))
         {
             Debug.Log(isCharging);
-            //Debug.Log("Charging!");
             //Check if the maximum charge
             if(accuracy < 1.0)
             {
@@ -104,7 +106,6 @@ public class LaserRifle : RangeWeapon {
                 script.setOrigin(firePoint.transform.position);
                 //Debug.Log("isHere");
                 script.initialize(hit, true);
-                //Debug.Log("isHere");
             }
             accuracy = 0.4f;
             coolDownCounter = coolDown;

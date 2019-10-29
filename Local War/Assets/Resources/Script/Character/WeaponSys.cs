@@ -8,7 +8,7 @@ public class WeaponSys : NetworkBehaviour {
     private     int         currentWeaponPos;
     private     Camera      playerCam;
     private     GameObject  weaponList;
-    private     GameObject  currentWeapon;
+    private     Weapon      currentWeapon;
 
     public void AddWeapon()
     {
@@ -30,6 +30,14 @@ public class WeaponSys : NetworkBehaviour {
 
     }
 
+    public void AddUI(GameObject customUI)
+    {
+        if(isLocalPlayer)
+        {
+
+        }
+    }
+
     // Use this for initialization
     void Start ()
     {
@@ -37,8 +45,16 @@ public class WeaponSys : NetworkBehaviour {
         playerCam = transform.Find("Main Camera").GetComponent<Camera>();
         weaponList = transform.Find("Weapons").gameObject;
 
-        //Initialize the weapon
-        currentWeapon = weaponList.transform.GetChild(1).gameObject;
+        /*****Initialize the weapon*****/
+
+        //Select initial weapon
+        currentWeapon = weaponList.transform.GetChild(1).GetComponent<Weapon>();
+        //Set the custom UI
+        if(isLocalPlayer)
+        {
+            GameObject cUI = currentWeapon.CustomUI();
+            cUI.transform.SetParent(GameObject.Find("PlayerUI").transform);
+        }
         currentWeaponPos = 1;
 	}
 	
@@ -46,27 +62,27 @@ public class WeaponSys : NetworkBehaviour {
 	void Update ()
     {
         if(hasAuthority)
-        if (Input.GetButton("Fire1"))
         {
-            CmdFire();
-        }
+            if (Input.GetButtonDown("Fire1"))
+            {
+                CmdFire();
+            }
+        }     
     }
 
     [Command]
     void CmdFire()
     {
+        //All the game object in all client will be called with this function
         RpcFire();
     }
 
     [ClientRpc]
     void RpcFire()
     {
-        //Get the access to the target
-        RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
-
         //Set the camera then perform attack
-        script.SetCamera(playerCam);
-        script.Fire(isServer);
+        currentWeapon.SetCamera(playerCam);
+        currentWeapon.Fire(isServer);
     }
 
 }

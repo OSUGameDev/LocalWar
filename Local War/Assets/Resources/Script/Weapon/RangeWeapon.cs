@@ -14,11 +14,6 @@ public class RangeWeapon : Weapon{
     public GameObject ammoType;
     public GameObject firePoint;
 
-    public virtual void Fire(bool isServer)
-    {
-        
-    }
-
     protected void CoolDown()
     {
         if (isShooting)
@@ -33,7 +28,7 @@ public class RangeWeapon : Weapon{
     
 	// Use this for initialization
 	void Start () {
-        isShooting = false;
+
 	}
 	
 	// Update is called once per frame
