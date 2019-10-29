@@ -38,8 +38,8 @@ public class WeaponSys : NetworkBehaviour {
         weaponList = transform.Find("Weapons").gameObject;
 
         //Initialize the weapon
-        currentWeapon = weaponList.transform.GetChild(0).gameObject;
-        currentWeaponPos = 0;
+        currentWeapon = weaponList.transform.GetChild(1).gameObject;
+        currentWeaponPos = 1;
 	}
 	
 	// Update is called once per frame
@@ -49,7 +49,6 @@ public class WeaponSys : NetworkBehaviour {
         if (Input.GetButton("Fire1"))
         {
             CmdFire();
-
         }
     }
 
