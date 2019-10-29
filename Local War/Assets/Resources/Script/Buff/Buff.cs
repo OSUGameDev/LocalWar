@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Buff : MonoBehaviour {
 
-    protected string name;
+    protected string bname;
+
     struct info
     {
         int paraNum;
@@ -13,6 +14,6 @@ public class Buff : MonoBehaviour {
 
     public void setName(string newName)
     {
-        name = newName;
+        bname = newName;
     }
 }
