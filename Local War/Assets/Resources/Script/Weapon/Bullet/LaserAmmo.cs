@@ -10,7 +10,11 @@ public class LaserAmmo : Ammo {
     private     Vector3         destination;
     private     LineRenderer    line;
 
+<<<<<<< HEAD
     public override void initialize(RaycastHit hit)
+=======
+    public override void initialize(RaycastHit hit, bool isServer)
+>>>>>>> parent of abd412a... Laser Rifle v0.3
     {
         damage = 15.0f;
 
@@ -19,6 +23,12 @@ public class LaserAmmo : Ammo {
         line.SetPosition(0, origin);
         line.SetPosition(1, hit.point);
 
+<<<<<<< HEAD
+=======
+        if (!isServer)
+            return;
+
+>>>>>>> parent of abd412a... Laser Rifle v0.3
         LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
         if (target != null)
         {

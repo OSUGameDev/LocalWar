@@ -8,7 +8,7 @@ public abstract class Ammo : MonoBehaviour {
     protected   float       damage;
     protected   Vector3     origin;
 
-    public virtual void initialize(RaycastHit hit)
+    public virtual void initialize(RaycastHit hit, bool isServer)
     {
 
     }

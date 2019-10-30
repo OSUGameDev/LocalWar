@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LaserRifleAmmo : Ammo {
+public class LaserRifleAmmo : LaserAmmo {
 
     public float maxRadius;
 
@@ -10,18 +10,28 @@ public class LaserRifleAmmo : Ammo {
     private Vector3 destination;
     private LineRenderer line;
 
+<<<<<<< HEAD
     public override void initialize(RaycastHit hit)
+=======
+    public override void initialize(RaycastHit hit, bool isServer)
+>>>>>>> parent of abd412a... Laser Rifle v0.3
     {
         damage = 45.0f;
 
         //If put the get function in Start then it will not execute properly
         line = GetComponent<LineRenderer>();
 
-        //Draw the laser on all client
         destination = hit.point;
         line.SetPosition(0, origin);
         line.SetPosition(1, destination);
 
+<<<<<<< HEAD
+=======
+        if (!isServer)
+            return;
+
+
+>>>>>>> parent of abd412a... Laser Rifle v0.3
         LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
         if (target != null)
         {
