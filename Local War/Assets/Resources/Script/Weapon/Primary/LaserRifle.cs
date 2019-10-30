@@ -58,6 +58,19 @@ public class LaserRifle : RangeWeapon
         }
     }
 
+<<<<<<< HEAD
+=======
+    public override GameObject CustomUI()
+    {
+        //Create UI instance
+        customUIInstance = Instantiate(customUI);
+        customUIInstance.SetActive(false);
+        StoreUIPos();
+        Debug.Log(customUIInstance);
+        return base.CustomUI();
+    }
+
+>>>>>>> parent of abd412a... Laser Rifle v0.3
     // Use this for initialization
 <<<<<<< HEAD
     void Start()
@@ -76,7 +89,10 @@ public class LaserRifle : RangeWeapon
         accuracy = 0.4f;
         coolDown = 2.0f;
         isCharging = false;
+<<<<<<< HEAD
         StoreUIPos();
+=======
+>>>>>>> parent of abd412a... Laser Rifle v0.3
     }
 <<<<<<< HEAD
 
@@ -88,6 +104,10 @@ public class LaserRifle : RangeWeapon
 	// Update is called once per frame
 	void Update () {
 <<<<<<< HEAD
+<<<<<<< HEAD
+        Debug.Log(customUIInstance);
+>>>>>>> parent of abd412a... Laser Rifle v0.3
+=======
         Debug.Log(customUIInstance);
 >>>>>>> parent of abd412a... Laser Rifle v0.3
 
@@ -97,7 +117,10 @@ public class LaserRifle : RangeWeapon
         if (isCharging && Input.GetButton("Fire1"))
         {
             Debug.Log(isCharging);
+<<<<<<< HEAD
             //Debug.Log("Charging!");
+=======
+>>>>>>> parent of abd412a... Laser Rifle v0.3
             //Check if the maximum charge
             if(accuracy < 1.0)
             {
@@ -112,11 +135,14 @@ public class LaserRifle : RangeWeapon
         {
             isCharging = false;
 <<<<<<< HEAD
+<<<<<<< HEAD
             //Call the ray casting on the server
             CmdRayCast();
 
             //Reset the parameter on all client
 =======
+=======
+>>>>>>> parent of abd412a... Laser Rifle v0.3
             //Cast a ray from center of the camera
             Ray ray = playerCame.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
             //Find the target point
@@ -128,7 +154,11 @@ public class LaserRifle : RangeWeapon
                 script.setOrigin(firePoint.transform.position);
                 //Debug.Log("isHere");
                 script.initialize(hit, true);
+<<<<<<< HEAD
                 //Debug.Log("isHere");
+            }
+>>>>>>> parent of abd412a... Laser Rifle v0.3
+=======
             }
 >>>>>>> parent of abd412a... Laser Rifle v0.3
             accuracy = 0.4f;
@@ -136,7 +166,11 @@ public class LaserRifle : RangeWeapon
             RepositionUI();
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
     }
+=======
+	}
+>>>>>>> parent of abd412a... Laser Rifle v0.3
 }
 =======
 	}

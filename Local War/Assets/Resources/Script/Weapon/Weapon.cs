@@ -18,6 +18,9 @@ public class Weapon : NetworkBehaviour
 public class Weapon : NetworkBehaviour {
     protected int       id;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> parent of abd412a... Laser Rifle v0.3
     protected int           type;
     protected string        description;
     protected Camera        playerCame;

@@ -68,6 +68,7 @@ public class WeaponSys : NetworkBehaviour
             cUI.transform.SetParent(GameObject.Find("PlayerUI").transform);
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
     }
 
     // Update is called once per frame
@@ -79,6 +80,8 @@ public class WeaponSys : NetworkBehaviour
         //Initialize the weapon
         currentWeapon = weaponList.transform.GetChild(1).gameObject;
 >>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
+=======
+>>>>>>> parent of abd412a... Laser Rifle v0.3
         currentWeaponPos = 1;
 	}
 	
@@ -87,6 +90,9 @@ public class WeaponSys : NetworkBehaviour
     {
         if(hasAuthority)
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of abd412a... Laser Rifle v0.3
+=======
 >>>>>>> parent of abd412a... Laser Rifle v0.3
         {
             if (Input.GetButtonDown("Fire1"))
@@ -104,6 +110,7 @@ public class WeaponSys : NetworkBehaviour
     [Command]
     void CmdFire()
     {
+        //All the game object in all client will be called with this function
         RpcFire();
     }
 
@@ -114,8 +121,13 @@ public class WeaponSys : NetworkBehaviour
         RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
 
         //Set the camera then perform attack
+<<<<<<< HEAD
         script.SetCamera(playerCam);
         script.Fire(isServer);
+=======
+        currentWeapon.SetCamera(playerCam);
+        currentWeapon.Fire(isServer);
+>>>>>>> parent of abd412a... Laser Rifle v0.3
     }
 
 }

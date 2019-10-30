@@ -11,7 +11,11 @@ public class LaserAmmo : Ammo {
     private     LineRenderer    line;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public override void initialize(RaycastHit hit)
+=======
+    public override void initialize(RaycastHit hit, bool isServer)
+>>>>>>> parent of abd412a... Laser Rifle v0.3
 =======
     public override void initialize(RaycastHit hit, bool isServer)
 >>>>>>> parent of abd412a... Laser Rifle v0.3
@@ -24,6 +28,12 @@ public class LaserAmmo : Ammo {
         line.SetPosition(1, hit.point);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        if (!isServer)
+            return;
+
+>>>>>>> parent of abd412a... Laser Rifle v0.3
 =======
         if (!isServer)
             return;
