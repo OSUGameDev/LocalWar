@@ -3,27 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Weapon : NetworkBehaviour {
-<<<<<<< HEAD
-    protected int           id;
-    protected int           type;
-    protected string        description;
-    protected Camera        playerCame;
-    protected bool          isShooting;
-    protected bool          isFinishShoot;
-    public    GameObject    customUI;
-    protected GameObject    customUIInstance;
+public class Weapon : NetworkBehaviour
+{
+    protected int id;
+    protected int type;
+    protected string description;
+    protected Camera playerCame;
+    protected bool isShooting;
+    protected bool isFinishShoot;
+    public GameObject customUI;
+    protected GameObject customUIInstance;
 
     public virtual void Fire()
     {
 
     }
-=======
-    protected int       id;
-    protected int       type;
-    protected string    description;
-    protected Camera    playerCame;
->>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
 
     public void SetDescription(string des)
     {
@@ -35,7 +29,6 @@ public class Weapon : NetworkBehaviour {
     {
         playerCame = targetCamera;
     }
-<<<<<<< HEAD
 
     public virtual GameObject CustomUI()
     {
@@ -54,6 +47,4 @@ public class Weapon : NetworkBehaviour {
     {
 
     }
-=======
->>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
 }
