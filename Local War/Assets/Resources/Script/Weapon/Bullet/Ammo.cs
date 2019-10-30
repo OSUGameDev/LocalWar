@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Networking;
 
-public abstract class Ammo : MonoBehaviour {
+public abstract class Ammo : NetworkBehaviour {
 
     protected   float       damage;
     protected   Vector3     origin;
 
-    public virtual void initialize(RaycastHit hit, bool isServer)
+    public virtual void initialize(Vector3 destination)
     {
 
     }

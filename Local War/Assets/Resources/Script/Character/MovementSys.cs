@@ -9,7 +9,7 @@ public class MovementSys : NetworkBehaviour {
     private float jumpSpeed = 10.0f;      //the jump force of the character
     private float rotateSpeed = 100.0f;
 
-    private float gravity = 20.0f;       //the force of gravity on the character
+    private float gravity = 9.0f;       //the force of gravity on the character
 
     private float groundOffset = .2f;    //the offset for the IsGrounded check. Useful for recognizing slopes and imperfect ground.
 
@@ -66,10 +66,11 @@ public class MovementSys : NetworkBehaviour {
         /*****Move the player*****/
         controller.Move(moveDirection * Time.deltaTime);    //move the character based on the gravitational force.
         if (!controller.isGrounded)
-        {
             jumpDirection.y -= gravity * Time.deltaTime;
-        }
+
         controller.Move(jumpDirection * Time.deltaTime);
+        if(controller.isGrounded)
+            jumpDirection.y = 0;
     }
 
     //This built-in function will be called after the script first time loaded into the scene

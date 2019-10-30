@@ -160,7 +160,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4286482934196666}
-  - component: {fileID: 114614685994560042}
+  - component: {fileID: 114172741410612698}
   m_Layer: 0
   m_Name: LaserRifle
   m_TagString: Untagged
@@ -1112,6 +1112,20 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114172741410612698
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1548057835304366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52476f51788e55544a7bb8b43636626a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  customUI: {fileID: 1798245664862530, guid: 8908f75da3035d247a37c42385fbc561, type: 2}
+  ammoType: {fileID: 1743428648829860, guid: 6506dba328a9af746ad7af9557e8605d, type: 2}
+  firePoint: {fileID: 1021880492235320}
 --- !u!114 &114174395702920276
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1166,23 +1180,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71702cdaea061a84d93af2fd97e75af4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  customUI: {fileID: 0}
   ammoType: {fileID: 1743428648829860, guid: 34a6848497f7ca74ea388d2ed0c7eda5, type: 2}
   firePoint: {fileID: 1805449505934080}
---- !u!114 &114614685994560042
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1548057835304366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52476f51788e55544a7bb8b43636626a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ammoType: {fileID: 1743428648829860, guid: 6506dba328a9af746ad7af9557e8605d, type: 2}
-  firePoint: {fileID: 1021880492235320}
-  laserRifleUI: {fileID: 1798245664862530, guid: 8908f75da3035d247a37c42385fbc561,
-    type: 2}
 --- !u!114 &114788496790337474
 MonoBehaviour:
   m_ObjectHideFlags: 1

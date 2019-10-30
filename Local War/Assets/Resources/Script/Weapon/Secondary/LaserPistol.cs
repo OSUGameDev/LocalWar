@@ -1,25 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class LaserPistol : RangeWeapon {
 
-    public override void Fire(bool isServer)
+    void RayCast()
     {
-        //Cast a ray from center of the camera
         Ray ray = playerCame.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
         //Find the target point
         RaycastHit hit;
-        //If the ray hit something
-        if (Physics.Raycast(ray, out hit) && !isShooting)
+        if (Physics.Raycast(ray, out hit))
         {
-            GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
-            Ammo script = bullet.GetComponent<Ammo>();
-            script.setOrigin(firePoint.transform.position);
-            script.initialize(hit, isServer);
-            isShooting = true;
-            coolDownCounter = coolDown;
+            ShootLaser(hit.point);
         }
+    }
+
+    void ShootLaser(Vector3 destination)
+    {
+        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
+        Ammo script = bullet.GetComponent<Ammo>();
+        script.setOrigin(firePoint.transform.position);
+        script.initialize(destination);
+    }
+
+    public override void Fire()
+    {
+        RayCast();
+
+        isShooting = true;
+        coolDownCounter = coolDown;
     }
 
     // Use this for initialization

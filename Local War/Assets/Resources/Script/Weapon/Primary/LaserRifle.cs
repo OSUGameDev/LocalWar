@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LaserRifle : RangeWeapon
-{
+public class LaserRifle : RangeWeapon {
 
     private float accuracy;
     private bool isCharging;
     private Vector2[] uiPos;
-    protected GameObject playerUI;
-    public GameObject laserRifleUI;
 
+    //Used for initialization
     private void StoreUIPos()
     {
         //Initialize the UI store list
@@ -18,161 +16,114 @@ public class LaserRifle : RangeWeapon
         //Store the initial position
         for (int i = 0; i < 4; i++)
         {
-            RectTransform current = laserRifleUI.transform.GetChild(i).GetComponent<RectTransform>();
+            RectTransform current = customUIInstance.transform.GetChild(i).GetComponent<RectTransform>();
             float x = current.anchoredPosition.x;
             float y = current.anchoredPosition.y;
             uiPos[i] = new Vector2(x, y);
         }
     }
 
+    //One of the charging effect, runs on client
     private void ShrinkUI()
     {
         for (int i = 0; i < 4; i++)
         {
-            RectTransform current = laserRifleUI.transform.GetChild(i).GetComponent<RectTransform>();
+            RectTransform current = customUIInstance.transform.GetChild(i).GetComponent<RectTransform>();
             float x = current.anchoredPosition.x * 0.995f;
             float y = current.anchoredPosition.y * 0.995f;
             current.anchoredPosition = new Vector2(x, y);
         }
     }
 
+    //This function used to reposition the UI after fire
     private void RepositionUI()
     {
         for (int i = 0; i < 4; i++)
         {
-            RectTransform current = laserRifleUI.transform.GetChild(i).GetComponent<RectTransform>();
-            float x = current.anchoredPosition.x;
-            float y = current.anchoredPosition.y;
+            RectTransform current = customUIInstance.transform.GetChild(i).GetComponent<RectTransform>();
             current.anchoredPosition = uiPos[i];
         }
-    }
+    } 
 
-    public override void Fire(bool isServer)
+    //This function will be called by the weaponSys script when player pull the trigger
+    public override void Fire()
     {
         //If the ray hit something
-        if (!isShooting && isServer)
+        if (!isShooting)
         {
-            Debug.Log("Trigger!");
             isShooting = true;
             isCharging = true;
         }
     }
 
-<<<<<<< HEAD
-=======
+    //This function will be called by the weaponSys script owned by the player, not the copy of other client
     public override GameObject CustomUI()
     {
         //Create UI instance
         customUIInstance = Instantiate(customUI);
         customUIInstance.SetActive(false);
         StoreUIPos();
-        Debug.Log(customUIInstance);
         return base.CustomUI();
     }
 
->>>>>>> parent of abd412a... Laser Rifle v0.3
-    // Use this for initialization
-<<<<<<< HEAD
-    void Start()
+    void RayCast()
     {
-=======
-    void Start () {
-        //Get the main UI canvas
-        playerUI = GameObject.Find("PlayerUI");
-        //Instantiate the custom UI 
-        laserRifleUI = Instantiate(laserRifleUI);
-        //Append the UI to the main UI canvas
-        laserRifleUI.transform.parent = transform;
+        Ray ray = playerCame.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
+        //Find the target point
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.Log(hit);
+            ShootLaser(hit.point);
+        }
+    }
 
->>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
+    void ShootLaser(Vector3 destination)
+    {
+        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
+        Ammo script = bullet.GetComponent<Ammo>();
+        script.setOrigin(firePoint.transform.position);
+        script.initialize(destination);
+    }
+
+    // Use this for initialization
+    void Start ()
+    {
         //Initialize the accuracy
         accuracy = 0.4f;
         coolDown = 2.0f;
         isCharging = false;
-<<<<<<< HEAD
-        StoreUIPos();
-=======
->>>>>>> parent of abd412a... Laser Rifle v0.3
+        isFinishShoot = false;
     }
-<<<<<<< HEAD
-
-    // Update is called once per frame
-    void Update()
-    {
-=======
 	
 	// Update is called once per frame
 	void Update () {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        Debug.Log(customUIInstance);
->>>>>>> parent of abd412a... Laser Rifle v0.3
-=======
-        Debug.Log(customUIInstance);
->>>>>>> parent of abd412a... Laser Rifle v0.3
 
-=======
->>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
         //Debug.Log(Input.GetMouseButton(0));
         if (isCharging && Input.GetButton("Fire1"))
         {
-            Debug.Log(isCharging);
-<<<<<<< HEAD
             //Debug.Log("Charging!");
-=======
->>>>>>> parent of abd412a... Laser Rifle v0.3
+            //Debug.Log(isCharging);
             //Check if the maximum charge
-            if(accuracy < 1.0)
+            if (accuracy < 1.0)
             {
-
                 //Increase accuracy
                 accuracy += 0.002f;
                 //Shrink the crosshair
                 ShrinkUI();
             }
         }
-        else if (isCharging && Input.GetButtonUp("Fire1"))
+        else if(isCharging && Input.GetButtonUp("Fire1"))
         {
             isCharging = false;
-<<<<<<< HEAD
-<<<<<<< HEAD
             //Call the ray casting on the server
-            CmdRayCast();
-
+            RayCast();
+            
             //Reset the parameter on all client
-=======
-=======
->>>>>>> parent of abd412a... Laser Rifle v0.3
-            //Cast a ray from center of the camera
-            Ray ray = playerCame.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-            //Find the target point
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
-                Ammo script = bullet.GetComponent<Ammo>();
-                script.setOrigin(firePoint.transform.position);
-                //Debug.Log("isHere");
-                script.initialize(hit, true);
-<<<<<<< HEAD
-                //Debug.Log("isHere");
-            }
->>>>>>> parent of abd412a... Laser Rifle v0.3
-=======
-            }
->>>>>>> parent of abd412a... Laser Rifle v0.3
             accuracy = 0.4f;
             coolDownCounter = coolDown;
             RepositionUI();
+            isFinishShoot = true;
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
     }
-=======
-	}
->>>>>>> parent of abd412a... Laser Rifle v0.3
 }
-=======
-	}
-}
->>>>>>> parent of abd412a... Laser Rifle v0.3
