@@ -1166,7 +1166,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71702cdaea061a84d93af2fd97e75af4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  customUI: {fileID: 0}
   ammoType: {fileID: 1743428648829860, guid: 34a6848497f7ca74ea388d2ed0c7eda5, type: 2}
   firePoint: {fileID: 1805449505934080}
 --- !u!114 &114614685994560042
@@ -1180,9 +1179,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52476f51788e55544a7bb8b43636626a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  customUI: {fileID: 1798245664862530, guid: 8908f75da3035d247a37c42385fbc561, type: 2}
   ammoType: {fileID: 1743428648829860, guid: 6506dba328a9af746ad7af9557e8605d, type: 2}
   firePoint: {fileID: 1021880492235320}
+  laserRifleUI: {fileID: 1798245664862530, guid: 8908f75da3035d247a37c42385fbc561,
+    type: 2}
 --- !u!114 &114788496790337474
 MonoBehaviour:
   m_ObjectHideFlags: 1

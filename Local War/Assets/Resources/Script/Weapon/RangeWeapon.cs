@@ -14,7 +14,15 @@ public class RangeWeapon : Weapon{
     public GameObject ammoType;
     public GameObject firePoint;
 
+<<<<<<< HEAD
     //The count down function, used after each shot
+=======
+    public virtual void Fire(bool isServer)
+    {
+        
+    }
+
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
     protected void CoolDown()
     {
         if (isShooting)
@@ -27,10 +35,22 @@ public class RangeWeapon : Weapon{
             }
         }
     }
+<<<<<<< HEAD
 
     // Update is called once per frame
     void FixedUpdate () {
         if(isFinishShoot)
             CoolDown();     
+=======
+    
+	// Use this for initialization
+	void Start () {
+        isShooting = false;
+	}
+	
+	// Update is called once per frame
+	void FixedUpdate () {
+        CoolDown();     
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
 	}
 }
