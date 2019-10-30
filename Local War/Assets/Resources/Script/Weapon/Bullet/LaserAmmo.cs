@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class LaserAmmo : Ammo {
 
@@ -10,7 +11,17 @@ public class LaserAmmo : Ammo {
     private     Vector3         destination;
     private     LineRenderer    line;
 
-    public override void initialize(RaycastHit hit, bool isServer)
+    [Command]
+    void CmdHitTarget(RaycastHit hit)
+    {
+        LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
+        if (target != null)
+        {
+            target.InflictDamage(damage);
+        }
+    }
+
+    public override void initialize(RaycastHit hit)
     {
         damage = 15.0f;
 
@@ -19,14 +30,7 @@ public class LaserAmmo : Ammo {
         line.SetPosition(0, origin);
         line.SetPosition(1, hit.point);
 
-        if (!isServer)
-            return;
-
-        LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
-        if (target != null)
-        {
-            target.InflictDamage(damage);
-        }
+        CmdHitTarget(hit);
     }
 
     void Start ()

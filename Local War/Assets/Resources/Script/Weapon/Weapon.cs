@@ -4,15 +4,16 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class Weapon : NetworkBehaviour {
-    protected int       id;
+    protected int           id;
     protected int           type;
     protected string        description;
     protected Camera        playerCame;
-    //protected WeaponSys     player;
+    protected bool          isShooting;
+    protected bool          isFinishShoot;
     public    GameObject    customUI;
     protected GameObject    customUIInstance;
 
-    public virtual void Fire(bool isServer)
+    public virtual void Fire()
     {
 
     }
@@ -22,6 +23,7 @@ public class Weapon : NetworkBehaviour {
         description = des;
     }
 
+    //The function to set current weapon's camera, used to Aimming, only runs on server
     public void SetCamera(Camera targetCamera)
     {
         playerCame = targetCamera;
@@ -32,6 +34,12 @@ public class Weapon : NetworkBehaviour {
         customUIInstance.SetActive(true);
         //Return the instance
         return customUIInstance;
+    }
+
+    //Checking function, only runs on server
+    public bool IsShooting()
+    {
+        return isShooting;
     }
 
     void Start()

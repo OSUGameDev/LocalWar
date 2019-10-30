@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class RangeWeapon : Weapon{
 
@@ -9,11 +10,11 @@ public class RangeWeapon : Weapon{
     protected int     totalAmmo;
     protected float   coolDown;
     protected float   coolDownCounter;
-    protected bool    isShooting;
 
     public GameObject ammoType;
     public GameObject firePoint;
 
+    //The count down function, used after each shot
     protected void CoolDown()
     {
         if (isShooting)
@@ -22,17 +23,14 @@ public class RangeWeapon : Weapon{
             if (coolDownCounter <= 0)
             {
                 isShooting = false;
+                isFinishShoot = false;
             }
         }
     }
-    
-	// Use this for initialization
-	void Start () {
 
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-        CoolDown();     
+    // Update is called once per frame
+    void FixedUpdate () {
+        if(isFinishShoot)
+            CoolDown();     
 	}
 }

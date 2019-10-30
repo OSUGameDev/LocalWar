@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class LaserRifleAmmo : LaserAmmo {
+public class LaserRifleAmmo : Ammo {
 
     public float maxRadius;
 
@@ -10,26 +11,29 @@ public class LaserRifleAmmo : LaserAmmo {
     private Vector3 destination;
     private LineRenderer line;
 
-    public override void initialize(RaycastHit hit, bool isServer)
+    [Command]
+    void CmdHitTarget(RaycastHit hit)
+    {
+        LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
+        if (target != null)
+        {
+            target.InflictDamage(damage);
+        }
+    }
+
+    public override void initialize(RaycastHit hit)
     {
         damage = 45.0f;
 
         //If put the get function in Start then it will not execute properly
         line = GetComponent<LineRenderer>();
 
+        //Draw the laser on all client
         destination = hit.point;
         line.SetPosition(0, origin);
         line.SetPosition(1, destination);
 
-        if (!isServer)
-            return;
-
-
-        LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
-        if (target != null)
-        {
-            target.InflictDamage(damage);
-        }
+        CmdHitTarget(hit);
     }
 
     void Start()

@@ -49,19 +49,20 @@ public class WeaponSys : NetworkBehaviour {
 
         //Select initial weapon
         currentWeapon = weaponList.transform.GetChild(1).GetComponent<Weapon>();
-        //Set the custom UI
-        if(isLocalPlayer)
+        currentWeaponPos = 1;
+
+        //Set the custom UI, only the player's object will execute this
+        if (isLocalPlayer)
         {
             GameObject cUI = currentWeapon.CustomUI();
             cUI.transform.SetParent(GameObject.Find("PlayerUI").transform);
         }
-        currentWeaponPos = 1;
-	}
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(hasAuthority)
+        if(hasAuthority && isLocalPlayer)
         {
             if (Input.GetButtonDown("Fire1"))
             {
@@ -73,16 +74,16 @@ public class WeaponSys : NetworkBehaviour {
     [Command]
     void CmdFire()
     {
-        //All the game object in all client will be called with this function
         RpcFire();
     }
 
     [ClientRpc]
+    //This will called on all instance of this player
     void RpcFire()
     {
         //Set the camera then perform attack
         currentWeapon.SetCamera(playerCam);
-        currentWeapon.Fire(isServer);
+        currentWeapon.Fire();
     }
 
 }
