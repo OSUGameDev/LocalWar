@@ -6,10 +6,17 @@ using UnityEngine.Networking;
 public class WeaponSys : NetworkBehaviour
 {
 
+<<<<<<< HEAD
     private int currentWeaponPos;
     private Camera playerCam;
     private GameObject weaponList;
     private Weapon currentWeapon;
+=======
+    private     int         currentWeaponPos;
+    private     Camera      playerCam;
+    private     GameObject  weaponList;
+    private     GameObject  currentWeapon;
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
 
     public void AddWeapon()
     {
@@ -31,6 +38,7 @@ public class WeaponSys : NetworkBehaviour
 
     }
 
+<<<<<<< HEAD
     public void AddUI(GameObject customUI)
     {
         if (isLocalPlayer)
@@ -39,6 +47,8 @@ public class WeaponSys : NetworkBehaviour
         }
     }
 
+=======
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
     // Use this for initialization
     void Start()
     {
@@ -46,6 +56,7 @@ public class WeaponSys : NetworkBehaviour
         playerCam = transform.Find("Main Camera").GetComponent<Camera>();
         weaponList = transform.Find("Weapons").gameObject;
 
+<<<<<<< HEAD
         /*****Initialize the weapon*****/
 
         //Select initial weapon
@@ -64,6 +75,10 @@ public class WeaponSys : NetworkBehaviour
     {
         if (hasAuthority && isLocalPlayer)
 =======
+=======
+        //Initialize the weapon
+        currentWeapon = weaponList.transform.GetChild(1).gameObject;
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
         currentWeaponPos = 1;
 	}
 	
@@ -71,28 +86,36 @@ public class WeaponSys : NetworkBehaviour
 	void Update ()
     {
         if(hasAuthority)
+<<<<<<< HEAD
 >>>>>>> parent of abd412a... Laser Rifle v0.3
         {
             if (Input.GetButtonDown("Fire1"))
             {
                 CmdFire();
             }
+=======
+        if (Input.GetButton("Fire1"))
+        {
+            CmdFire();
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
         }
     }
 
     [Command]
     void CmdFire()
     {
-        //All the game object in all client will be called with this function
         RpcFire();
     }
 
     [ClientRpc]
     void RpcFire()
     {
+        //Get the access to the target
+        RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
+
         //Set the camera then perform attack
-        currentWeapon.SetCamera(playerCam);
-        currentWeapon.Fire(isServer);
+        script.SetCamera(playerCam);
+        script.Fire(isServer);
     }
 
 }

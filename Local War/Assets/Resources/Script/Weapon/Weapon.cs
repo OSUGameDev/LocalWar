@@ -17,6 +17,7 @@ public class Weapon : NetworkBehaviour
 =======
 public class Weapon : NetworkBehaviour {
     protected int       id;
+<<<<<<< HEAD
     protected int           type;
     protected string        description;
     protected Camera        playerCame;
@@ -29,6 +30,11 @@ public class Weapon : NetworkBehaviour {
     {
 
     }
+=======
+    protected int       type;
+    protected string    description;
+    protected Camera    playerCame;
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
 
     public void SetDescription(string des)
     {
@@ -39,6 +45,7 @@ public class Weapon : NetworkBehaviour {
     {
         playerCame = targetCamera;
     }
+<<<<<<< HEAD
 
     public virtual GameObject CustomUI()
     {
@@ -52,3 +59,6 @@ public class Weapon : NetworkBehaviour {
 
     }
 }
+=======
+}
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2

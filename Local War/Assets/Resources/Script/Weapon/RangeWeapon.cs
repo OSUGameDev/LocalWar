@@ -23,6 +23,11 @@ public class RangeWeapon : Weapon
     public GameObject ammoType;
     public GameObject firePoint;
 
+    public virtual void Fire(bool isServer)
+    {
+        
+    }
+
     protected void CoolDown()
     {
         if (isShooting)
@@ -37,6 +42,7 @@ public class RangeWeapon : Weapon
     
 	// Use this for initialization
 	void Start () {
+<<<<<<< HEAD
 
 <<<<<<< HEAD
     // Update is called once per frame
@@ -47,6 +53,9 @@ public class RangeWeapon : Weapon
     }
 }
 =======
+=======
+        isShooting = false;
+>>>>>>> parent of 1c1b9bf... Laser Rifle v0.2
 	}
 	
 	// Update is called once per frame
