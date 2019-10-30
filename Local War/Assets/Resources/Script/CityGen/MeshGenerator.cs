@@ -9,7 +9,7 @@ public class MeshGenerator : NetworkBehaviour
     // Constant variables, edit to change effects
 
     // City Map stuff
-    const int citySize = 5;                                         // Number of blocks in city
+    const int citySize = 10;                                         // Number of blocks in city
     const int blockSize = 10;                                       // Number of building locations per block
     const int buildMinSize = 3;                                     // Min size of a building in X and Z dimension
     const int buildMaxSize = 5;                                     // Max size of a building in X and Z dimension
@@ -18,8 +18,8 @@ public class MeshGenerator : NetworkBehaviour
     const float buildingThickness = .05f;                           // Wall thickness
 
     // Building height stuff
-    const float baseHeight = 2f;                                    // Mininum building height
-    const float baseRange = 3f;                                     // Range above minimum building height
+    const float baseHeight = 1.5f;                                    // Mininum building height
+    const float baseRange = 3.5f;                                     // Range above minimum building height
     const float extraTallBuildings = 0.02f;                         // Adds a % chance of a building to be extraHeight taller
     const float extraHeight = 10.0f;                                // Extra height in case of building being taller
 
@@ -29,7 +29,7 @@ public class MeshGenerator : NetworkBehaviour
 
     // Perlin noise changes
     readonly float refinement = 0.01f;                              // Changes the frequency of the noise, lower number = smoother terrain
-    readonly float magnitude = 40f;                                 // Changes the magnitude, lower numbers = flatter terrain
+    readonly float magnitude = 35f;                                 // Changes the magnitude, lower numbers = flatter terrain
 
     // Random seed for level generation
     [SyncVar]
@@ -61,8 +61,9 @@ public class MeshGenerator : NetworkBehaviour
     public void GenerateMap()
     {
         Random.InitState(seed);
-        x_offset = Random.Range(0, 2);
-        z_offset = Random.Range(0, 2);
+        Debug.Log(seed);
+        x_offset = Random.Range(-100, 100);
+        z_offset = Random.Range(-100, 100);
 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
