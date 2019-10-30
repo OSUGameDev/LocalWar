@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Networking;
 
-public abstract class Ammo : NetworkBehaviour {
+public abstract class Ammo : MonoBehaviour {
 
     protected   float       damage;
     protected   Vector3     origin;

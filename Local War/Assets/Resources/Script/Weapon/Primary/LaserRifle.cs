@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class LaserRifle : RangeWeapon {
+public class LaserRifle:RangeWeapon {
 
     private float accuracy;
     private bool isCharging;
