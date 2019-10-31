@@ -7,12 +7,12 @@ public class MovementSys : NetworkBehaviour
 {
     private Vector3 player_velocity;
     private Vector3 player_acceleration;
-    public Vector3 min_speed = new Vector3(10.0f, 0.0f, 10.0f);
-    public Vector3 max_speed = new Vector3(600.0f, 0.0f, 600.0f);
-    public Vector3 acceleration = new Vector3(50.0f, 0.0f, 50.0f);
-    public Vector3 decceleration = new Vector3(50.0f, 0.0f, 50.0f);
-    private Vector2 previous_input_direction;
-    private Vector2 input_direction;
+    public Vector3 min_speed = new Vector3(0.1f, 0.0f, 0.1f);
+    public Vector3 max_speed = new Vector3(1.0f, 0.0f, 1.0f);
+    public Vector3 acceleration = new Vector3(1.0f, 0.0f, 1.0f);
+    public Vector3 decceleration = new Vector3(2.0f, 0.0f, 2.0f);
+    private Vector3 previous_input_direction;
+    private Vector3 input_direction;
     private Vector2 previous_mouse_axis;
     private Vector2 mouse_axis;
     public float sensitivity = 100.0f;
@@ -54,11 +54,12 @@ public class MovementSys : NetworkBehaviour
         Quaternion rotation_start = transform.rotation;
         Quaternion rotation_end = Quaternion.Euler(mouse_axis.y, mouse_axis.x, 0.0f);
         transform.rotation = Quaternion.Lerp(rotation_start, rotation_end, 0.5f);
-        // TODO: add forward facing vector
 
         // movement
-        input_direction.x = Mathf.Sign(Input.GetAxis("Horizontal"));
-        input_direction.y = Mathf.Sign(Input.GetAxis("Vertical"));
+        input_direction.x = signf(Input.GetAxis("Horizontal"));
+        input_direction.y = 0.0f;
+        input_direction.z = signf(Input.GetAxis("Vertical")); 
+
     }
 
     private void Move()
@@ -98,20 +99,20 @@ public class MovementSys : NetworkBehaviour
             }
         }
         // forward
-        if (input_direction.y < 0)
+        if (input_direction.z < 0)
         {
             if (player_velocity.z <= min_speed.z && player_velocity.z > -max_speed.z)
             {
-                player_acceleration.z = acceleration.z * input_direction.y;
+                player_acceleration.z = acceleration.z * input_direction.z;
                 stop_walk = false;
             }
         }
         // back
-        else if (input_direction.y > 0)
+        else if (input_direction.z > 0)
         {
             if (player_velocity.z >= -min_speed.z && player_velocity.z < max_speed.z)
             {
-                player_acceleration.z = acceleration.z * input_direction.y;
+                player_acceleration.z = acceleration.z * input_direction.z;
                 stop_walk = false;
             }
         }
@@ -119,7 +120,7 @@ public class MovementSys : NetworkBehaviour
         // stop strafe
         if (stop_strafe)
         {
-            float v_sign = Mathf.Sign(player_velocity.x);
+            float v_sign = signf(player_velocity.x);
             float v_len = Mathf.Abs(player_velocity.x) - (decceleration.x * Time.deltaTime);
             if (v_len < 0)
             {
@@ -130,7 +131,7 @@ public class MovementSys : NetworkBehaviour
         // stop walk
         if (stop_walk)
         {
-            float v_sign = Mathf.Sign(player_velocity.z);
+            float v_sign = signf(player_velocity.z);
             float v_len = Mathf.Abs(player_velocity.z) - (decceleration.z * Time.deltaTime);
             if (v_len < 0)
             {
@@ -139,13 +140,15 @@ public class MovementSys : NetworkBehaviour
             player_velocity.z = v_sign * v_len;
         }
 
+        // TODO: adjust for foward
+        Vector3 forward_adjust = transform.TransformDirection( input_direction );
+
         // apply acceleration
-        player_velocity.x += player_acceleration.x * Time.deltaTime;
+        player_velocity.x += player_acceleration.x * Time.deltaTime * forward_adjust.x;
         player_velocity.y += player_acceleration.y * Time.deltaTime;
-        player_velocity.z += player_acceleration.z * Time.deltaTime;
+        player_velocity.z += player_acceleration.z * Time.deltaTime * forward_adjust.z;
 
         // apply movement
-        Debug.Log( player_velocity );
         kinematic_controller.Move(player_velocity);
     }
 
@@ -165,4 +168,10 @@ public class MovementSys : NetworkBehaviour
         Move();
     }
 
+    private int signf( float val )
+    {
+        if (val == 0) return 0;
+        else if (val > 0) return 1;
+        else return -1;
+    }
 }
