@@ -43,17 +43,6 @@ public class LaserRifle : RangeWeapon {
             RectTransform current = customUIInstance.transform.GetChild(i).GetComponent<RectTransform>();
             current.anchoredPosition = uiPos[i];
         }
-    } 
-
-    //This function will be called by the weaponSys script when player pull the trigger
-    public override void Fire()
-    {
-        //If the ray hit something
-        if (!isShooting)
-        {
-            isShooting = true;
-            isCharging = true;
-        }
     }
 
     //This function will be called by the weaponSys script owned by the player, not the copy of other client
@@ -66,19 +55,17 @@ public class LaserRifle : RangeWeapon {
         return base.CustomUI();
     }
 
-    void RayCast()
+    //This function will be called by the weaponSys script when player pull the trigger
+    public override void Fire()
     {
-        Ray ray = playerCame.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
-        //Find the target point
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
+        if (!isShooting)
         {
-            Debug.Log(hit);
-            ShootLaser(hit.point);
+            isShooting = true;
+            isCharging = true;
         }
     }
 
-    void ShootLaser(Vector3 destination)
+    public override void Shoot(Vector3 destination)
     {
         GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
         Ammo script = bullet.GetComponent<Ammo>();
@@ -102,8 +89,6 @@ public class LaserRifle : RangeWeapon {
         //Debug.Log(Input.GetMouseButton(0));
         if (isCharging && Input.GetButton("Fire1"))
         {
-            //Debug.Log("Charging!");
-            //Debug.Log(isCharging);
             //Check if the maximum charge
             if (accuracy < 1.0)
             {
@@ -116,8 +101,17 @@ public class LaserRifle : RangeWeapon {
         else if(isCharging && Input.GetButtonUp("Fire1"))
         {
             isCharging = false;
+
+            //Generate the prefab
+            //ammoType = Instantiate(ammoType);
+
+            Debug.Log(ammoType.GetComponent<Ammo>().returnDmg());
+
             //Call the ray casting on the server
-            RayCast();
+            playerWeaponSys.CmdRayCastFirePlayer(
+                ammoType,
+                ammoType.GetComponent<Ammo>().returnDmg(), 
+                accuracy);
             
             //Reset the parameter on all client
             accuracy = 0.4f;

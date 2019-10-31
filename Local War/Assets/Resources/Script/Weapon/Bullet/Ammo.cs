@@ -14,6 +14,11 @@ public abstract class Ammo : NetworkBehaviour {
 
     }
 
+    public virtual float returnDmg()
+    {
+        return damage;
+    }
+
     public void setOrigin(Vector3 originPoint)
     {
         origin = originPoint;

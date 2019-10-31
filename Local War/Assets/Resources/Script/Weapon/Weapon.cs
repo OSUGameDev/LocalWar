@@ -7,7 +7,7 @@ public class Weapon : MonoBehaviour {
     protected int           id;
     protected int           type;
     protected string        description;
-    protected Camera        playerCame;
+    protected WeaponSys     playerWeaponSys;
     protected bool          isShooting;
     protected bool          isFinishShoot;
     public    GameObject    customUI;
@@ -18,15 +18,20 @@ public class Weapon : MonoBehaviour {
 
     }
 
+    public virtual void Shoot(Vector3 destination)
+    {
+
+    }
+
     public void SetDescription(string des)
     {
         description = des;
     }
 
     //The function to set current weapon's camera, used to Aimming, only runs on server
-    public void SetCamera(Camera targetCamera)
+    public void SetPlayer(WeaponSys targetPlayer)
     {
-        playerCame = targetCamera;
+        playerWeaponSys = targetPlayer;
     }
 
     public virtual GameObject CustomUI()

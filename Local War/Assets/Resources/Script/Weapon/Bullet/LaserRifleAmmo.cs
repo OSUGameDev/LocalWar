@@ -13,8 +13,6 @@ public class LaserRifleAmmo : Ammo {
 
     public override void initialize(Vector3 destination)
     {
-        damage = 45.0f;
-
         //If put the get function in Start then it will not execute properly
         line = GetComponent<LineRenderer>();
 
@@ -23,12 +21,18 @@ public class LaserRifleAmmo : Ammo {
         line.SetPosition(1, destination);
     }
 
+    public override float returnDmg()
+    {
+        return 45.0f;
+    }
+
     void Start()
     {
         line.startWidth = 0;
         line.endWidth = 0;
         angle = 0;
         maxRadius = 0.05f;
+        damage = 45.0f;
     }
 
     void FixedUpdate()
