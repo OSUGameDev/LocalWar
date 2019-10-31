@@ -80,6 +80,9 @@ public class MeshGenerator : NetworkBehaviour
                 BuildingGeneration((blockSize * i) + (i * roadSize) + roadSize, (blockSize * k) + (k * roadSize) + roadSize);
             }
         }
+
+        // Generate Invisible Arena Walls
+        InvisibleWall();
     }
 
     void BuildingGeneration(int x, int z)
@@ -184,6 +187,28 @@ public class MeshGenerator : NetworkBehaviour
         cube.GetComponent<MeshRenderer>().material = newMat;
         cube.AddComponent<ReCalcCubeTexture>();
     }
+
+    // Create Invisible walls so players can't fall off the plane
+    void InvisibleWall()
+    {
+        //Total arena size per wall
+        float arenaWallSize = (citySize * blockSize + citySize * roadSize + roadSize);
+
+        //Height of wall
+        float arenaWallHeight = 100f;
+
+        // Width of wall
+        float arenaWallWidth = .5f;
+
+        // Build Bottom Left Walls
+        BuildWall(arenaWallSize / 2, 0, 0, arenaWallSize, arenaWallHeight, arenaWallWidth);
+        BuildWall(0, 0, arenaWallSize / 2, arenaWallWidth, arenaWallHeight, arenaWallSize);
+
+        // Build Top Right Walls
+        BuildWall(arenaWallSize, 0, arenaWallSize / 2, arenaWallWidth, arenaWallHeight, arenaWallSize);
+        BuildWall(arenaWallSize / 2, 0, arenaWallSize, arenaWallSize, arenaWallHeight, arenaWallWidth);
+    }
+
 
     void CreateShape()
     {
