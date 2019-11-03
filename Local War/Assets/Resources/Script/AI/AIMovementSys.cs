@@ -43,14 +43,14 @@ public class AIMovementSys : MonoBehaviour{
     {
         Vector3 targetRot = nextDestination - transform.position;
         targetRot.y = 0.5f;
-        Vector3 newDir = Vector3.RotateTowards(transform.forward,targetRot,rotateSpeed*Time.deltaTime,0.0f);
-        Debug.DrawRay(transform.position, newDir, Color.red);
+        //Vector3 newDir = Vector3.RotateTowards(transform.forward,targetRot,rotateSpeed*Time.deltaTime,0.0f);
+        //Debug.DrawRay(transform.position, newDir, Color.red);
         //Lock rotation axis
         //transform.rotation = Quaternion.LookRotation(newDir);
         
-        moveDirection = new Vector3(nextDestination.x, 0.8f,nextDestination.z);       //Create the player's movement from keyboard in local space
-        moveDirection = transform.TransformDirection(moveDirection);      //Transform the moveMent from local space to world space
-        //moveDirection *= speed *Time.deltaTime;      //Based on base speed
+        moveDirection = new Vector3(nextDestination.x, 0.5f,nextDestination.z);       //Create the player's movement from keyboard in local space
+        //moveDirection = transform.TransformDirection(moveDirection);      //Transform the moveMent from local space to world space
+        //moveDirection *= speed;      //Based on base speed
 
         /*****Check jump mode at last*****/
         /*if (Input.GetButtonDown("Jump"))               //jump if the character is grounded and the user presses the jump button.
@@ -60,7 +60,7 @@ public class AIMovementSys : MonoBehaviour{
         */
 
         /*****Move the character */
-        //rb.MovePosition(transform.position + moveDirection);    //move the character based on the gravitational force.
+        transform.position = Vector3.MoveTowards(transform.position,moveDirection,speed*Time.deltaTime);    //move the character based on the gravitational force.
       
     }
 
