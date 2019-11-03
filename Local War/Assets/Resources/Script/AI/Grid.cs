@@ -97,6 +97,46 @@ public class Grid : MonoBehaviour
                 NeighborList.Add(NodeArray[icheckX, icheckY]);//Add the grid to the available neighbors list
             }
         }
+        //Check Top Right side of node
+        icheckX = a_NeighborNode.iGridX + 1;
+        icheckY = a_NeighborNode.iGridY + 1;
+        if (icheckX >= 0 && icheckX < iGridSizeX)//If the XPosition is in range of the array
+        {
+            if (icheckY >= 0 && icheckY < iGridSizeY)//If the YPosition is in range of the array
+            {
+                NeighborList.Add(NodeArray[icheckX, icheckY]);//Add the grid to the available neighbors list
+            }
+        }
+        //Check the Bottom Left side of node
+        icheckX = a_NeighborNode.iGridX - 1;
+        icheckY = a_NeighborNode.iGridY - 1;
+        if (icheckX >= 0 && icheckX < iGridSizeX)//If the XPosition is in range of the array
+        {
+            if (icheckY >= 0 && icheckY < iGridSizeY)//If the YPosition is in range of the array
+            {
+                NeighborList.Add(NodeArray[icheckX, icheckY]);//Add the grid to the available neighbors list
+            }
+        }
+        //Check the Bottom Right side of node
+        icheckX = a_NeighborNode.iGridX - 1;
+        icheckY = a_NeighborNode.iGridY + 1;
+        if (icheckX >= 0 && icheckX < iGridSizeX)//If the XPosition is in range of the array
+        {
+            if (icheckY >= 0 && icheckY < iGridSizeY)//If the YPosition is in range of the array
+            {
+                NeighborList.Add(NodeArray[icheckX, icheckY]);//Add the grid to the available neighbors list
+            }
+        }
+        //Check the Top Left side of node
+        icheckX = a_NeighborNode.iGridX + 1;
+        icheckY = a_NeighborNode.iGridY - 1;
+        if (icheckX >= 0 && icheckX < iGridSizeX)//If the XPosition is in range of the array
+        {
+            if (icheckY >= 0 && icheckY < iGridSizeY)//If the YPosition is in range of the array
+            {
+                NeighborList.Add(NodeArray[icheckX, icheckY]);//Add the grid to the available neighbors list
+            }
+        }
 
         return NeighborList;//Return the neighbors list.
     }
