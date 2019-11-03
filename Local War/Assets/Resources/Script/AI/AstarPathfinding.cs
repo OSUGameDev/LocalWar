@@ -26,13 +26,13 @@ public class AstarPathfinding : MonoBehaviour
     private void Update()//Every frame
     {
         TargetPosition = GameObject.FindGameObjectWithTag("Player").transform;
-        if(TargetPosition.position != LastPositon){
+        if(TargetPosition.position.x != LastPositon.x && TargetPosition.position.z != LastPositon.z){
             FindPath(transform.position, TargetPosition.position);
             LastPositon = TargetPosition.position; //Dont make a new path until the position moves
         }
         //Find a path to the goal
         if(CurrentPath[0] != null){
-            if(transform.position != CurrentPath[0].vPosition){ //while not at the first node in the array
+            if(transform.position.x != CurrentPath[0].vPosition.x || transform.position.z != CurrentPath[0].vPosition.z ){ //while not at the first node in the array
                 nextDestination = CurrentPath[0].vPosition;
                 //Debug.Log(CurrentPath[0].vPosition);
             }
