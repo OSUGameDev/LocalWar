@@ -96,6 +96,8 @@ public class MovementSys : NetworkBehaviour {
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            if (isServer)
+                NetworkManager.singleton.StopServer();
             NetworkManager.singleton.StopClient();
         }
     }
