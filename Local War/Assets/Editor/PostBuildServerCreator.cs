@@ -9,10 +9,8 @@ public class MyBuildProcess {
     [PostProcessBuild]
     public static void OnPostProcessBuild(BuildTarget target, string pathAToBuiltProject)
     {
-        Debug.Log(pathAToBuiltProject);
         string directory = Path.GetDirectoryName(pathAToBuiltProject);
         string fileName = Path.GetFileName(pathAToBuiltProject);
-
         switch (target)
         {
             case BuildTarget.StandaloneWindows:
