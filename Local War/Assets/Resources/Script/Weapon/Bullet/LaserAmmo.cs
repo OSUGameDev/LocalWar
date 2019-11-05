@@ -13,14 +13,17 @@ public class LaserAmmo : Ammo {
 
     public override void initialize(Vector3 destination)
     {
-        damage = 15.0f;
-
         //If put the get function in Start then it will not execute properly
         line = GetComponent<LineRenderer>();
 
         //Draw the laser on all client
         line.SetPosition(0, origin);
         line.SetPosition(1, destination);
+    }
+
+    public override float returnDmg()
+    {
+        return 15.0f;
     }
 
     void Start ()

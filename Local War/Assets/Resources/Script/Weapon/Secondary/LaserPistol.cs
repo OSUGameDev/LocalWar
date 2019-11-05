@@ -7,21 +7,35 @@ public class LaserPistol : RangeWeapon {
 
     public override void Fire()
     {
+        Debug.Log("Pistol fire!");
         if (!isShooting)
         {
             isShooting = true;
 
             //Call the ray casting on the server
             playerWeaponSys.CmdRayCastFirePlayer(
-                ammoType, 
-                1.0f, 
-                ammoType.GetComponent<Ammo>().returnDmg());
+                ammoType,
+                ammoType.GetComponent<Ammo>().returnDmg(),
+                1.0f);
+
+            coolDownCounter = coolDown;
         }
+    }
+
+    public override void Shoot(Vector3 destination)
+    {
+        Debug.Log("Pistol shoot!");
+        GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
+        Ammo script = bullet.GetComponent<Ammo>();
+        script.setOrigin(firePoint.transform.position);
+        script.initialize(destination);
+
+        isFinishShoot = true;
     }
 
     // Use this for initialization
     void Start () {
-        coolDown = 0.2f;
+        coolDown = 0.01f;
     }
 	
 	// Update is called once per frame

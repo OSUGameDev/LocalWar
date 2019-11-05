@@ -98,14 +98,15 @@ public class WeaponSys : NetworkBehaviour {
         /*****Initialize the weapon*****/
 
         //Select initial weapon
-        currentWeapon = weaponList.transform.GetChild(1).GetComponent<Weapon>();
-        currentWeaponPos = 1;
+        currentWeapon = weaponList.transform.GetChild(0).GetComponent<Weapon>();
+        currentWeaponPos = 0;
 
         //Set the custom UI, only the player's object will execute this
         if (isLocalPlayer)
         {
             GameObject cUI = currentWeapon.CustomUI();
-            cUI.transform.SetParent(GameObject.Find("PlayerUI").transform);
+            if(cUI != null)
+                cUI.transform.SetParent(GameObject.Find("PlayerUI").transform);
         }
     }
 	
