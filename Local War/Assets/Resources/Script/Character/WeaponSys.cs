@@ -92,8 +92,8 @@ public class WeaponSys : NetworkBehaviour {
     void Start ()
     {
         //Initialize the objects
-        playerCam = transform.Find("Main Camera").GetComponent<Camera>();
-        weaponList = transform.Find("Weapons").gameObject;
+        playerCam = transform.Find("Head").Find("Main Camera").GetComponent<Camera>();
+        weaponList = transform.Find("Head").Find("Weapons").gameObject;
 
         /*****Initialize the weapon*****/
 
