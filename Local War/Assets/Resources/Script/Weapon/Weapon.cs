@@ -36,7 +36,8 @@ public class Weapon : MonoBehaviour {
 
     public virtual GameObject CustomUI()
     {
-        customUIInstance.SetActive(true);
+        if(customUIInstance != null)
+            customUIInstance.SetActive(true);
         //Return the instance
         return customUIInstance;
     }
