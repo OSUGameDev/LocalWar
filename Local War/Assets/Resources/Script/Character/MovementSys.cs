@@ -140,13 +140,16 @@ public class MovementSys : NetworkBehaviour
             player_velocity.z = v_sign * v_len;
         }
 
-        // TODO: adjust for foward
-        Vector3 forward_adjust = transform.TransformDirection( input_direction );
+        // transform acceleration to forward
+        Vector2 temp_accel = new Vector2( player_acceleration.x, player_acceleration.z );
+        Vector2 temp_forw  = new Vector2( transform.forward.x, transform.forward.z ); temp_forw.Normalize();
+        Vector2 new_accel  = temp_forw * Vector2.Dot(temp_accel, temp_forw);
+        player_acceleration.x = new_accel.x; player_acceleration.z = new_accel.y;
 
         // apply acceleration
-        player_velocity.x += player_acceleration.x * Time.deltaTime * forward_adjust.x;
+        player_velocity.x += player_acceleration.x * Time.deltaTime;
         player_velocity.y += player_acceleration.y * Time.deltaTime;
-        player_velocity.z += player_acceleration.z * Time.deltaTime * forward_adjust.z;
+        player_velocity.z += player_acceleration.z * Time.deltaTime;
 
         // apply movement
         kinematic_controller.Move(player_velocity);
