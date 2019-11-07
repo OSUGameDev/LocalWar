@@ -29,7 +29,7 @@ public class MeshGenerator : NetworkBehaviour
 
     // Perlin noise changes
     readonly float refinement = 0.01f;                              // Changes the frequency of the noise, lower number = smoother terrain
-    readonly float magnitude = 35f;                                 // Changes the magnitude, lower numbers = flatter terrain
+    readonly float magnitude = 45f;                                 // Changes the magnitude, lower numbers = flatter terrain
 
     // Random seed for level generation
     [SyncVar]
@@ -169,7 +169,7 @@ public class MeshGenerator : NetworkBehaviour
                     BuildWall(xMid, yMid, z2, buildingX, buildingHeight, buildingThickness);
                     BuildWall(x1, yMid, zMid, buildingThickness, buildingHeight, buildingZ);
                     BuildWall(x2, yMid, zMid, buildingThickness, buildingHeight, buildingZ);
-                    BuildWall(xMid, buildingHeight, zMid, buildingX, buildingThickness, buildingZ);
+                    BuildCeil(xMid, buildingHeight, zMid, buildingX, buildingThickness, buildingZ);
                 }
             }
             row++;
@@ -186,7 +186,45 @@ public class MeshGenerator : NetworkBehaviour
         cube.transform.localScale = new Vector3(sx, sy, sz);
         cube.GetComponent<MeshRenderer>().material = newMat;
         cube.AddComponent<ReCalcCubeTexture>();
+		float color = Random.Range (0.0f, 0.5f);
+		Color teal = new Vector4 (0, .5f+color, .5f+color);
+		Color yellow = new Vector4 (0, .5f+color, color);
+		Color red = new Vector4 (0, color, .5f+color);
+		int choice = Random.Range (0, 10);
+		var cubeRenderer = cube.GetComponent<Renderer>();
+		if (choice <= 1) 
+		{
+			cubeRenderer.material.SetColor("_Color", yellow);
+		}
+		else if (choice >= 7) 
+		{
+			cubeRenderer.material.SetColor("_Color", red);
+		}
+		else 
+		{
+			cubeRenderer.material.SetColor("_Color", teal);
+		}
     }
+
+	void BuildCeil(float px, float py, float pz, float sx, float sy, float sz)
+	{
+		Material newMat = Resources.Load("Art/Material/Brick", typeof(Material)) as Material;
+		GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		cube.transform.position = new Vector3(px, py, pz);
+		cube.transform.localScale = new Vector3(sx, sy, sz);
+		cube.GetComponent<MeshRenderer>().material = newMat;
+		cube.AddComponent<ReCalcCubeTexture>();
+	}
+
+	void BuildInvisWall(float px, float py, float pz, float sx, float sy, float sz)
+	{
+		Material newMat = Resources.Load("Art/Material/Pure Color/Clear", typeof(Material)) as Material;
+		GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		cube.transform.position = new Vector3(px, py, pz);
+		cube.transform.localScale = new Vector3(sx, sy, sz);
+		var cubeRenderer = cube.GetComponent<Renderer>();
+		cubeRenderer.enabled = false;
+	}
 
     // Create Invisible walls so players can't fall off the plane
     void InvisibleWall()
@@ -201,12 +239,13 @@ public class MeshGenerator : NetworkBehaviour
         float arenaWallWidth = .5f;
 
         // Build Bottom Left Walls
-        BuildWall(arenaWallSize / 2, 0, 0, arenaWallSize, arenaWallHeight, arenaWallWidth);
-        BuildWall(0, 0, arenaWallSize / 2, arenaWallWidth, arenaWallHeight, arenaWallSize);
+		BuildInvisWall(arenaWallSize / 2, arenaWallHeight/2, 0, arenaWallSize, arenaWallHeight, arenaWallWidth);
+		BuildInvisWall(0, arenaWallHeight/2, arenaWallSize / 2, arenaWallWidth, arenaWallHeight, arenaWallSize);
 
         // Build Top Right Walls
-        BuildWall(arenaWallSize, 0, arenaWallSize / 2, arenaWallWidth, arenaWallHeight, arenaWallSize);
-        BuildWall(arenaWallSize / 2, 0, arenaWallSize, arenaWallSize, arenaWallHeight, arenaWallWidth);
+		BuildInvisWall(arenaWallSize, arenaWallHeight/2, arenaWallSize / 2, arenaWallWidth, arenaWallHeight, arenaWallSize);
+		BuildInvisWall(arenaWallSize / 2, arenaWallHeight/2, arenaWallSize, arenaWallSize, arenaWallHeight, arenaWallWidth);
+		BuildInvisWall(arenaWallSize / 2, arenaWallHeight, arenaWallSize/2, arenaWallSize, arenaWallWidth, arenaWallSize);
     }
 
 
