@@ -77,6 +77,12 @@ public class WeaponSys : NetworkBehaviour {
             /*****Modify the end point based on accuracy*****/
             RpcDrawbullet(hit.point);
         }
+        else
+        {
+            Vector3 target = ray.GetPoint(500.0f);
+            //target *= 100;
+            RpcDrawbullet(target);
+        }
     }
 
     //Draw the trail on all client
