@@ -61,10 +61,9 @@ public class MovementSys : NetworkBehaviour
         transform.rotation = Quaternion.Lerp(rotation_start, rotation_end, 0.5f);
 
         // movement
-        input_direction.x = Input.GetAxis("Horizontal");
+        input_direction.x = signf(Input.GetAxis("Horizontal"));
         input_direction.y = 0.0f;
-        input_direction.z = Input.GetAxis("Vertical");
-
+        input_direction.z = signf(Input.GetAxis("Vertical"));
     }
 
     private void Move()
@@ -83,55 +82,68 @@ public class MovementSys : NetworkBehaviour
         player_acceleration.y = 0.0f; // -gravity * Time.deltaTime;
         player_acceleration.z = 0.0f;
 
-        Vector3 movement_forward = new Vector3( transform.forward.x, 0.0f, transform.forward.z ); movement_forward.Normalize();
         // strafe
-        if ( input_direction.x != 0 )
+        if ( input_direction.x != 0.0f )
         {
+            // max speed constraints
+            if (player_velocity.x < -max_speed.x || player_velocity.x > max_speed.x)
+            {
+                player_velocity.x = max_speed.x * signf(player_velocity.x);
+            }
             // accelerate left/right in regard to forward
-            Vector3 cross = Vector3.Cross(movement_forward, transform.up);
-            player_acceleration += cross * (float)( acceleration.x * input_direction.x );
+            else
+            {
+                Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
+                Vector3 cross = Vector3.Cross(movement_forward, transform.up);
+                player_acceleration += cross * acceleration.x * input_direction.x;
+            }
         }
         else
         {
-            // deccelerate based on velocity direction
-            //Vector3 opposite_movement_direction = new Vector3( -1.0f * signf(player_velocity.x), 0.0f, -1.0f * signf(player_velocity.z) );
-            //Vector3 cross = Vector3.Cross(opposite_movement_direction, transform.up);
-            //player_acceleration += cross * decceleration.x;
             // static friction
             if (player_velocity.x > -min_speed.x && player_velocity.x < min_speed.x)
             {
                 player_velocity.x = 0.0f;
-                player_acceleration.x = 0.0f;
+            }
+            // dynamic friction
+            else
+            {
+                Vector3 velocity_forward = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_forward.Normalize();
+                Vector3 cross = Vector3.Cross(velocity_forward, transform.up);
+                player_acceleration -= cross * decceleration.x;
             }
         }
 
-        // forward
+        // forward/backwards
         if (input_direction.z != 0.0f)
         {
+            // max speed constraints
+            if (player_velocity.z < -max_speed.z || player_velocity.z > max_speed.z)
+            {
+                player_velocity.z = max_speed.z * signf(player_velocity.z);
+            }
             // accelerate with forward on x,z plane
-            player_acceleration += movement_forward * acceleration.z * input_direction.z;
+            else
+            {
+                Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
+                player_acceleration += movement_forward * acceleration.z * input_direction.z;
+                player_acceleration.y = 0.0f;
+            }
         }
         else
         {
-            // deccelerate against velocity direction
-            Vector3 velocity_direction = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_direction.Normalize();
-            player_acceleration -= velocity_direction * decceleration.z;
             // static friction
             if (player_velocity.z > -min_speed.z && player_velocity.z < min_speed.z)
             {
                 player_velocity.z = 0.0f;
-                player_acceleration.z = 0.0f;
             }
-        }
-
-        // apply speed constraints
-        if (player_velocity.x < -max_speed.x || player_velocity.x > max_speed.x)
-        {
-            player_velocity.x = max_speed.x * signf(player_velocity.x);
-        }
-        if (player_velocity.z < -max_speed.z || player_velocity.z > max_speed.z)
-        {
-            player_velocity.z = max_speed.z * signf(player_velocity.z);
+            // dynamic friction
+            else
+            {
+                Vector3 velocity_forward = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_forward.Normalize();
+                player_acceleration -= velocity_forward * decceleration.z;
+                player_acceleration.y = 0.0f;
+            }
         }
 
         // apply acceleration
@@ -139,7 +151,7 @@ public class MovementSys : NetworkBehaviour
         player_velocity.y += player_acceleration.y * Time.deltaTime;
         player_velocity.z += player_acceleration.z * Time.deltaTime;
 
-        Debug.Log(player_velocity);
+        Debug.Log(player_acceleration);
 
         // apply movement
         Vector3 translation = player_velocity * Time.deltaTime;
