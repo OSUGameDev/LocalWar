@@ -7,10 +7,10 @@ public class MovementSys : NetworkBehaviour
 {
     private Vector3 player_velocity;
     private Vector3 player_acceleration;
-    public Vector3 min_speed = new Vector3(0.001f, 0.0f, 0.001f);
-    public Vector3 max_speed = new Vector3(0.5f, 0.0f, 0.5f);
-    public Vector3 acceleration = new Vector3(8.0f, 0.0f, 12.0f);
-    public Vector3 decceleration = new Vector3(12.0f, 0.0f, 12.0f);
+    public Vector3  min_speed;
+    public Vector3  max_speed;
+    public Vector3  acceleration;
+    public Vector3  decceleration;
     private Vector3 previous_input_direction;
     private Vector3 input_direction;
     private Vector2 previous_mouse_axis;
@@ -26,6 +26,11 @@ public class MovementSys : NetworkBehaviour
 
     void Start()
     {
+        min_speed = new Vector3(0.1f, 0.0f, 0.1f);
+        max_speed = new Vector3(20.0f, 0.0f, 20.0f);
+        acceleration = new Vector3(20.0f, 0.0f, 20.0f);
+        decceleration = new Vector3(20.0f, 0.0f, 20.0f);
+
         player_velocity = min_speed;
         player_acceleration = new Vector3();
         input_direction = new Vector2();
@@ -75,12 +80,12 @@ public class MovementSys : NetworkBehaviour
 
         // get acceleration
         player_acceleration.x = 0.0f;
-        player_acceleration.y = 0.0f; // -gravity;
+        player_acceleration.y = 0.0f; // -gravity * Time.deltaTime;
         player_acceleration.z = 0.0f;
 
-        Vector3 movement_forward = new Vector3( transform.forward.x, 0.0f, transform.forward.z );
+        Vector3 movement_forward = new Vector3( transform.forward.x, 0.0f, transform.forward.z ); movement_forward.Normalize();
         // strafe
-        /*if ( input_direction.x != 0 )
+        if ( input_direction.x != 0 )
         {
             // accelerate left/right in regard to forward
             Vector3 cross = Vector3.Cross(movement_forward, transform.up);
@@ -89,10 +94,16 @@ public class MovementSys : NetworkBehaviour
         else
         {
             // deccelerate based on velocity direction
-            Vector3 opposite_movement_direction = new Vector3( -1.0f * signf(player_velocity.x), 0.0f, -1.0f * signf(player_velocity.z) );
-            Vector3 cross = Vector3.Cross(opposite_movement_direction, transform.up);
-            player_acceleration += cross * decceleration.x;
-        }*/
+            //Vector3 opposite_movement_direction = new Vector3( -1.0f * signf(player_velocity.x), 0.0f, -1.0f * signf(player_velocity.z) );
+            //Vector3 cross = Vector3.Cross(opposite_movement_direction, transform.up);
+            //player_acceleration += cross * decceleration.x;
+            // static friction
+            if (player_velocity.x > -min_speed.x && player_velocity.x < min_speed.x)
+            {
+                player_velocity.x = 0.0f;
+                player_acceleration.x = 0.0f;
+            }
+        }
 
         // forward
         if (input_direction.z != 0.0f)
@@ -103,61 +114,36 @@ public class MovementSys : NetworkBehaviour
         else
         {
             // deccelerate against velocity direction
-            player_acceleration += movement_forward * decceleration.z * -1.0f;
-        }
-
-        // limits
-        if (input_direction.x == 0.0f)
-        {
-            // its tween babay
-            if (player_velocity.x > -min_speed.x && player_velocity.x < min_speed.x)
-            {
-                player_velocity.x = 0.0f;
-            }
-            if (player_velocity.x < -max_speed.x || player_velocity.x > max_speed.x)
-            {
-                player_velocity.x = max_speed.x * signf(player_velocity.x);
-            }
-        }
-        if (input_direction.z == 0.0f)
-        { 
-            // its tween baby
+            Vector3 velocity_direction = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_direction.Normalize();
+            player_acceleration -= velocity_direction * decceleration.z;
+            // static friction
             if (player_velocity.z > -min_speed.z && player_velocity.z < min_speed.z)
             {
                 player_velocity.z = 0.0f;
-                kinematic_controller.velocity.z = 0.0f;  // I know I need a temp vec3, but why shouldn't CharacterController know it already?
+                player_acceleration.z = 0.0f;
             }
-            if (player_velocity.z < -max_speed.z || player_velocity.z > max_speed.z)
-            {
-                player_velocity.z = max_speed.z * signf(player_velocity.z);
-            }
-        }  // limit
+        }
+
+        // apply speed constraints
+        if (player_velocity.x < -max_speed.x || player_velocity.x > max_speed.x)
+        {
+            player_velocity.x = max_speed.x * signf(player_velocity.x);
+        }
+        if (player_velocity.z < -max_speed.z || player_velocity.z > max_speed.z)
+        {
+            player_velocity.z = max_speed.z * signf(player_velocity.z);
+        }
 
         // apply acceleration
         player_velocity.x += player_acceleration.x * Time.deltaTime;
         player_velocity.y += player_acceleration.y * Time.deltaTime;
         player_velocity.z += player_acceleration.z * Time.deltaTime;
 
-        // apply movement
-        kinematic_controller.Move(player_velocity);
         Debug.Log(player_velocity);
-        // player_velocity = kinematic_controller.velocity;  // why wouldn't this work?
-        Debug.Log(kinematic_controller.velocity);
-        Debug.Log("  ----   ");
 
-        // Might not be able to use Move function at all, to shitty. 
-        // You can't fuck with velocity at all, including reading it (or else it will crash).
-        // My guess? It calculates it each time....and doesn't use it to move :(
-        // We may need to write our own velocity and collision setup like:
-        //
-        //        position.x += player_velocity.x * Time.deltaTime;
-        //        position.y += player_velocity.y * Time.deltaTime;
-        //        position.z += player_velocity.z * Time.deltaTime;
-        //        
-        //        kinematic_controller.Move( new Vector3( 0.0f, 0.0f, 0.0f ) );  // collide
-        //
-        //        position = kinematic_controller.Position;  // adjust to movement fast because just a transform
-
+        // apply movement
+        Vector3 translation = player_velocity * Time.deltaTime;
+        transform.Translate(translation, Space.World);
     }
 
     void Update()
