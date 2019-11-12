@@ -2,42 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.IO;
 
 public class MeshGenerator : NetworkBehaviour
 {
-
-    // Constant variables, edit to change effects
-
-    // City Map stuff
-    const int citySize = 10;                                         // Number of blocks in city
-    const int blockSize = 10;                                       // Number of building locations per block
-    const int buildMinSize = 3;                                     // Min size of a building in X and Z dimension
-    const int buildMaxSize = 5;                                     // Max size of a building in X and Z dimension
-    const int roadSize = 2;                                         // Size of Roads
-    const float buildingSpacing = .4f;                              // Empty space around buildings, min 0 max .49
-    const float buildingThickness = .05f;                           // Wall thickness
-
-    // Building height stuff
-    const float baseHeight = 1.5f;                                    // Mininum building height
-    const float baseRange = 3.5f;                                     // Range above minimum building height
-    const float extraTallBuildings = 0.02f;                         // Adds a % chance of a building to be extraHeight taller
-    const float extraHeight = 10.0f;                                // Extra height in case of building being taller
-
-    // Building / Ground Noise
-    bool groundNoise = true;                                        // Change to add noise to ground level, also raises ground slightly, not reccommended but fun
-    bool buildingHeightNoise = true;                                // Adds noise to building height, also increases building height, dependent on citySize
-
-    // Perlin noise changes
-    readonly float refinement = 0.01f;                              // Changes the frequency of the noise, lower number = smoother terrain
-    readonly float magnitude = 45f;                                 // Changes the magnitude, lower numbers = flatter terrain
-
     // Random seed for level generation
     [SyncVar]
     public int seed = 1;
-
-    // Derived constants, DO NOT EDIT
-    const int xSize = (blockSize * citySize) + (citySize * roadSize) + (roadSize);          // Mesh size in X
-    const int zSize = (blockSize * citySize) + (citySize * roadSize) + (roadSize);          // Mesh size in Y
     float x_offset;
     float z_offset;
 
@@ -48,13 +19,13 @@ public class MeshGenerator : NetworkBehaviour
     Vector2[] uvs;
     int[] block;
 
+    MapGenSettings mapGenSettings;
+
     // Use this for initialization
     void Start()
     {
-        if (isServer)
-            this.seed = Random.Range(int.MinValue, int.MaxValue);
+        loadSettinsFile();
         GenerateMap();
-
     }
 
 
@@ -73,11 +44,12 @@ public class MeshGenerator : NetworkBehaviour
         UpdateMesh();
 
         // Generate blocks
-        for (int i = 0; i < citySize; i++)
+        for (int i = 0; i < mapGenSettings.citySize; i++)
         {
-            for (int k = 0; k < citySize; k++)
+            for (int k = 0; k < mapGenSettings.citySize; k++)
             {
-                BuildingGeneration((blockSize * i) + (i * roadSize) + roadSize, (blockSize * k) + (k * roadSize) + roadSize);
+                BuildingGeneration((mapGenSettings.blockSize * i) + (i * mapGenSettings.roadSize) + mapGenSettings.roadSize,
+                    (mapGenSettings.blockSize * k) + (k * mapGenSettings.roadSize) + mapGenSettings.roadSize);
             }
         }
 
@@ -91,64 +63,67 @@ public class MeshGenerator : NetworkBehaviour
         float xStart = x;
         float zStart = z;
         int[] buildingSize = {
-            Random.Range(buildMinSize,buildMaxSize+1),
-            Random.Range(buildMinSize,buildMaxSize+1)
+            Random.Range(mapGenSettings.buildMinSize,mapGenSettings.buildMaxSize+1),
+            Random.Range(mapGenSettings.buildMinSize,mapGenSettings.buildMaxSize+1)
         };
 
         // define block object for building placement logic
-        block = new int[blockSize * blockSize];
+        block = new int[mapGenSettings.blockSize * mapGenSettings.blockSize];
 
         // Set every space in the block as free
-        for (int i = 0, row = 0; i < blockSize; i++)
+        for (int i = 0, row = 0; i < mapGenSettings.blockSize; i++)
         {
-            for (int k = 0; k < blockSize; k++)
+            for (int k = 0; k < mapGenSettings.blockSize; k++)
             {
-                block[k + row * blockSize] = 0;
+                block[k + row * mapGenSettings.blockSize] = 0;
             }
             row++;
         }
 
         // Generate buildings
-        for (int i = 0, row = 0; i < blockSize; i++)
+        for (int i = 0, row = 0; i < mapGenSettings.blockSize; i++)
         {
-            for (int k = 0; k < blockSize; k++)
+            for (int k = 0; k < mapGenSettings.blockSize; k++)
             {
                 // For every square in the block, as long as that square is free
-                if (block[k + row * blockSize] == 0)
+                if (block[k + row * mapGenSettings.blockSize] == 0)
                 {
                     // Randomize next building size
-                    buildingSize[0] = Random.Range(buildMinSize, buildMaxSize + 1);
-                    buildingSize[1] = Random.Range(buildMinSize, buildMaxSize + 1);
+                    buildingSize[0] = Random.Range(mapGenSettings.buildMinSize, mapGenSettings.buildMaxSize + 1);
+                    buildingSize[1] = Random.Range(mapGenSettings.buildMinSize, mapGenSettings.buildMaxSize + 1);
 
                     // Extra randomize logic
-                    for (int r = buildMinSize - 1; r > 0; r--)
+                    for (int r = mapGenSettings.buildMinSize - 1; r > 0; r--)
                     {
-                        if ((buildingSize[0] + i + r) == blockSize)
+                        if ((buildingSize[0] + i + r) == mapGenSettings.blockSize)
                         {
                             buildingSize[0] += r;
                         }
-                        if ((buildingSize[1] + k + r) == blockSize)
+                        if ((buildingSize[1] + k + r) == mapGenSettings.blockSize)
                         {
                             buildingSize[1] += r;
                         }
                     }
 
                     // Get necessary vairable points, this could be cleaned up a lot
-                    float x1 = xStart + i + buildingSpacing;
-                    float x2 = Mathf.Min((xStart + i + buildingSize[0] - buildingSpacing), (xStart + blockSize - buildingSpacing));
+                    float x1 = xStart + i + mapGenSettings.buildingSpacing;
+                    float x2 = Mathf.Min((xStart + i + buildingSize[0] - mapGenSettings.buildingSpacing),
+                        (xStart + mapGenSettings.blockSize - mapGenSettings.buildingSpacing));
                     float xMid = (x1 + x2) / 2;
-                    float z1 = zStart + k + buildingSpacing;
-                    float z2 = Mathf.Min((zStart + k + buildingSize[1] - buildingSpacing), (zStart + blockSize - buildingSpacing));
+                    float z1 = zStart + k + mapGenSettings.buildingSpacing;
+                    float z2 = Mathf.Min((zStart + k + buildingSize[1] - mapGenSettings.buildingSpacing),
+                        (zStart + mapGenSettings.blockSize - mapGenSettings.buildingSpacing));
                     float zMid = (z1 + z2) / 2;
-                    float buildingHeight = Random.Range(baseHeight, baseHeight + baseRange);
-                    if (buildingHeightNoise == true)
+                    float buildingHeight = Random.Range(mapGenSettings.baseHeight, mapGenSettings.baseHeight + mapGenSettings.baseRange);
+                    if (mapGenSettings.buildingHeightNoise == true)
                     {
-                        buildingHeight += Mathf.PerlinNoise((x1 + x_offset) * refinement, (z1 + z_offset) * refinement) * magnitude;
+                        buildingHeight += Mathf.PerlinNoise((x1 + x_offset) * mapGenSettings.refinement,
+                            (z1 + z_offset) * mapGenSettings.refinement) * mapGenSettings.magnitude;
                     }
                     float tallB = Random.Range(0f, 1f);
-                    if (tallB < extraTallBuildings)
+                    if (tallB < mapGenSettings.extraTallBuildings)
                     {
-                        buildingHeight += extraHeight;
+                        buildingHeight += mapGenSettings.extraHeight;
                     }
                     float yMid = buildingHeight / 2;
                     float buildingX = x2 - x1;
@@ -160,16 +135,16 @@ public class MeshGenerator : NetworkBehaviour
                         for (int r = 0; r < buildingZ; r++)
                         {
                             // Debug.Log(buildingCounter + ": " + (k + j + ((row + r) * blockSize)));
-                            block[k + r + ((row + j) * blockSize)] = 1;
+                            block[k + r + ((row + j) * mapGenSettings.blockSize)] = 1;
                         }
                     }
 
                     // Build Walls
-                    BuildWall(xMid, yMid, z1, buildingX, buildingHeight, buildingThickness);
-                    BuildWall(xMid, yMid, z2, buildingX, buildingHeight, buildingThickness);
-                    BuildWall(x1, yMid, zMid, buildingThickness, buildingHeight, buildingZ);
-                    BuildWall(x2, yMid, zMid, buildingThickness, buildingHeight, buildingZ);
-                    BuildCeil(xMid, buildingHeight, zMid, buildingX, buildingThickness, buildingZ);
+                    BuildWall(xMid, yMid, z1, buildingX, buildingHeight,mapGenSettings.buildingThickness);
+                    BuildWall(xMid, yMid, z2, buildingX, buildingHeight, mapGenSettings.buildingThickness);
+                    BuildWall(x1, yMid, zMid, mapGenSettings.buildingThickness, buildingHeight, buildingZ);
+                    BuildWall(x2, yMid, zMid, mapGenSettings.buildingThickness, buildingHeight, buildingZ);
+                    BuildCeil(xMid, buildingHeight, zMid, buildingX, mapGenSettings.buildingThickness, buildingZ);
                 }
             }
             row++;
@@ -230,7 +205,10 @@ public class MeshGenerator : NetworkBehaviour
     void InvisibleWall()
     {
         //Total arena size per wall
-        float arenaWallSize = (citySize * blockSize + citySize * roadSize + roadSize);
+        float arenaWallSize = 
+            (mapGenSettings.citySize * mapGenSettings.blockSize 
+            + mapGenSettings.citySize * mapGenSettings.roadSize 
+            + mapGenSettings.roadSize);
 
         //Height of wall
         float arenaWallHeight = 100f;
@@ -252,17 +230,18 @@ public class MeshGenerator : NetworkBehaviour
     void CreateShape()
     {
         // Create Surface Vertices
-        vertices = new Vector3[(xSize + 1) * (zSize + 1)];
+        vertices = new Vector3[(mapGenSettings.xSize + 1) * (mapGenSettings.zSize + 1)];
 
-        for (int i = 0, z = 0; z <= zSize; z++)
+        for (int i = 0, z = 0; z <= mapGenSettings.zSize; z++)
         {
-            for (int x = 0; x <= xSize; x++)
+            for (int x = 0; x <= mapGenSettings.xSize; x++)
             {
                 float y;
 
-                if (groundNoise)
+                if (mapGenSettings.groundNoise)
                 {
-                    y = Mathf.PerlinNoise((x + x_offset) * refinement, (z + z_offset) * refinement) * magnitude - 1;
+                    y = Mathf.PerlinNoise((x + x_offset) * mapGenSettings.refinement,
+                        (z + z_offset) * mapGenSettings.refinement) * mapGenSettings.magnitude - 1;
                 }
                 else
                 {
@@ -275,20 +254,20 @@ public class MeshGenerator : NetworkBehaviour
         }
 
         // Create Surface Triangles
-        triangles = new int[xSize * zSize * 6];
+        triangles = new int[mapGenSettings.xSize * mapGenSettings.zSize * 6];
         int vert = 0;
         int tris = 0;
 
-        for (int z = 0; z < zSize; z++)
+        for (int z = 0; z < mapGenSettings.zSize; z++)
         {
-            for (int x = 0; x < xSize; x++)
+            for (int x = 0; x < mapGenSettings.xSize; x++)
             {
                 triangles[tris + 0] = (vert + 0);
-                triangles[tris + 1] = (vert + xSize + 1);
+                triangles[tris + 1] = (vert + mapGenSettings.xSize + 1);
                 triangles[tris + 2] = (vert + 1);
                 triangles[tris + 3] = (vert + 1);
-                triangles[tris + 4] = (vert + xSize + 1);
-                triangles[tris + 5] = (vert + xSize + 2);
+                triangles[tris + 4] = (vert + mapGenSettings.xSize + 1);
+                triangles[tris + 5] = (vert + mapGenSettings.xSize + 2);
 
                 vert++;
                 tris += 6;
@@ -299,11 +278,11 @@ public class MeshGenerator : NetworkBehaviour
         // Create Texture Map
         uvs = new Vector2[vertices.Length];
 
-        for (int i = 0, z = 0; z <= zSize; z++)
+        for (int i = 0, z = 0; z <= mapGenSettings.zSize; z++)
         {
-            for (int x = 0; x <= xSize; x++)
+            for (int x = 0; x <= mapGenSettings.xSize; x++)
             {
-                uvs[i] = new Vector2((float)x / xSize, (float)z / zSize);
+                uvs[i] = new Vector2((float)x / mapGenSettings.xSize, (float)z / mapGenSettings.zSize);
                 i++;
             }
         }
@@ -322,5 +301,46 @@ public class MeshGenerator : NetworkBehaviour
         meshc.sharedMesh = mesh;
     }
 
+    public void loadSettinsFile()
+    {
+        if (!isServer)
+            return;
+        seed = Random.Range(int.MinValue, int.MaxValue);
+        if (File.Exists("MapGenerationFile.xml"))
+            try
+            {
+                using (var fp = File.OpenRead("MapGenerationFile.xml"))
+                    mapGenSettings = CustomSerializer.Deserialize<MapGenSettings>(fp);
+                return;
+            }
+            catch
+            {
+                Debug.LogError("Unable to read map generation settings file");
+                File.Move("MapGenerationFile.xml", "CorruptMapGenerationFile.xml");
+            }
+        mapGenSettings = new MapGenSettings();
+        using (var fp = File.Create("MapGenerationFile.xml"))
+            CustomSerializer.Serialize(new MapGenSettings(), fp);
+
+    }
+
+    public override void OnDeserialize(NetworkReader reader, System.Boolean initialState)
+    {
+        if (initialState == false)
+            return;
+        seed = reader.ReadInt32();
+        mapGenSettings = CustomSerializer.Deserialize<MapGenSettings>(reader);
+    }
+
+    public override System.Boolean OnSerialize(NetworkWriter writer, System.Boolean initialState)
+    {
+        if (initialState != true)
+            return false;
+        if (mapGenSettings == null)
+            loadSettinsFile();
+        writer.Write(seed);
+        CustomSerializer.Serialize(mapGenSettings, writer);
+        return true;
+    }
 }
 
