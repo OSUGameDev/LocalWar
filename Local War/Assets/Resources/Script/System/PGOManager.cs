@@ -1,8 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class PooledGameObjects : MonoBehaviour
+public class PGOManager : MonoBehaviour
 {
 
     [SerializeField]
@@ -11,13 +11,17 @@ public class PooledGameObjects : MonoBehaviour
     [SerializeField]
     private int pooledAmount = 10;          //the number of objects in the pool
 
-    private Dictionary<string, List<GameObject>> pooledObjectsHT;		//contains pool of objects to 
-    private Dictionary<string, GameObject> pristeneObjects;             //used to grow the pool with a clean object (not used repeatdly)
+    //contains pool of objects to grab from 
+    private Dictionary<string, List<GameObject>> pooledObjectsHT;
+
+    //used to grow the pool with a clean object (not used repeatdly)
+    private Dictionary<string, GameObject> pristeneObjects;  
 
     // Use this for initialization
-    public void Awake()
-    { //changed to awake because guns were initializing prior to this function call.
-        pooledObjectsHT = new Dictionary<string, List<GameObject>>();   //initialize the pooled objects, list of lists. 
+    public void Awake() //must be awake because guns were initializing prior to this function call.
+    { 
+        //initialize the pooled objects, list of lists.
+        pooledObjectsHT = new Dictionary<string, List<GameObject>>();    
         pristeneObjects = new Dictionary<string, GameObject>();
     }
 
@@ -64,19 +68,22 @@ public class PooledGameObjects : MonoBehaviour
     /// Initializes the object with a specific key.
     /// </summary>
     /// <returns> ObjectId that will be used get a pooled object. </returns>
-    public int InitializeObjectType(string key, GameObject pooledObj)
+    public Type InitObject(GameObject pooledObj)
     {
-        pristeneObjects.Add(pooledObj);
-        pooledObjectsHT.Add(pooledObj.GetType() ,new List<GameObject>());
-        for (int i = 0; i < pooledAmount; i++)      //this loop creates the pooled objects and adds them to the pool (List) and deactivates them.
-        {
-            GameObject obj = (GameObject)Instantiate(pooledObj);
-            obj.SetActive(false);
+        Guid t = pooledObj.GetType().GUID;
+        Debug.Log("GUID:" + t);
 
-            pooledObjectsHT[pooledObjectsHT.Count - 1].Add(obj);
-        }
+// //pristeneObjects.Add(pooledObj);
+// //pooledObjectsHT.Add(pooledObj.GetType() ,new List<GameObject>());
+// //for (int i = 0; i < pooledAmount; i++)      //this loop creates the pooled objects and adds them to the pool (List) and deactivates them.
+// {
+//     GameObject obj = (GameObject)Instantiate(pooledObj);
+//     obj.SetActive(false);
 
-        return pooledObjectsHT.Count - 1; //id is the current size of the list-1
+//     //pooledObjectsHT[pooledObjectsHT.Count - 1].Add(obj);
+// }
+
+        return pooledObj.GetType(); //id is the current size of the list-1
     }
 
     public override string ToString()
