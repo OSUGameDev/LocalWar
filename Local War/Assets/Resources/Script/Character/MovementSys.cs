@@ -26,10 +26,10 @@ public class MovementSys : NetworkBehaviour
 
     void Start()
     {
-        min_speed = new Vector3(0.5f, 0.0f, 0.5f);
-        max_speed = new Vector3(20.0f, 0.0f, 20.0f);
-        acceleration = new Vector3(20.0f, 0.0f, 20.0f);
-        decceleration = new Vector3(20.0f, 0.0f, 20.0f);
+        min_speed       = new Vector3(1.0f, 0.0f, 1.0f);
+        max_speed       = new Vector3(10.0f, 0.0f, 10.0f);
+        acceleration    = new Vector3(40.0f, 0.0f, 40.0f);
+        decceleration   = new Vector3(60.0f, 0.0f, 60.0f);
 
         player_velocity = min_speed;
         player_acceleration = new Vector3();
@@ -82,8 +82,8 @@ public class MovementSys : NetworkBehaviour
         player_acceleration.y = 0.0f; // -gravity * Time.deltaTime;
         player_acceleration.z = 0.0f;
 
-        // strafe
-        /*if ( input_direction.x != 0.0f )
+        // strafing
+        if ( input_direction.x != 0.0f )
         {
             // max speed constraints
             if (player_velocity.x < -max_speed.x || player_velocity.x > max_speed.x)
@@ -94,37 +94,11 @@ public class MovementSys : NetworkBehaviour
             else
             {
                 Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
-                Vector3 cross = Vector3.Cross(movement_forward, transform.up);
-                player_acceleration += cross * acceleration.x * input_direction.x;
+                Vector3 movement_cross = Vector3.Cross(movement_forward, Vector3.up);
+                player_acceleration -= movement_cross * acceleration.x * input_direction.x;
             }
         }
-        else
-        {
-            // static friction
-            if (player_velocity.x > -min_speed.x && player_velocity.x < min_speed.x)
-            {
-                player_velocity.x = 0.0f;
-            }
-            // dynamic friction
-            else
-            {
-                Vector3 velocity_forward = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_forward.Normalize();
-                Vector3 cross = Vector3.Cross(velocity_forward, transform.up);
-                player_acceleration -= cross * decceleration.x;
-            }
-        }*/
-        // static friction
-        if (input_direction.x == 0.0f && input_direction.z == 0.0f)
-        {
-            if (player_velocity.x > -min_speed.x && player_velocity.x < min_speed.x)
-            {
-                player_velocity.x = 0.0f;
-            }
-            if (player_velocity.z > -min_speed.z && player_velocity.z < min_speed.z)
-            {
-                player_velocity.z = 0.0f;
-            }
-        }
+
         // forward/backwards
         if (input_direction.z != 0.0f)
         {
@@ -138,15 +112,36 @@ public class MovementSys : NetworkBehaviour
             {
                 Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
                 player_acceleration += movement_forward * acceleration.z * input_direction.z;
-                player_acceleration.y = 0.0f;
             }
         }
-        else
+
+        // friction
+        if (input_direction.x == 0.0f && input_direction.z == 0.0f)
         {
+            // static friction
+            if (player_velocity.x > -min_speed.x && player_velocity.x < min_speed.x)
+            {
+                player_velocity.x = 0.0f;
+            }
             // dynamic friction
-            Vector3 velocity_forward = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_forward.Normalize();
-            player_acceleration -= velocity_forward * decceleration.z;
-            player_acceleration.y = 0.0f;
+            else
+            {
+                Vector3 velocity_forward = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_forward.Normalize();
+                Vector3 movement_cross = Vector3.Cross(velocity_forward, Vector3.up);
+                player_acceleration += movement_cross * decceleration.x;
+            }
+
+            // static friction
+            if (player_velocity.z > -min_speed.z && player_velocity.z < min_speed.z)
+            {
+                player_velocity.z = 0.0f;
+            }
+            // dynamic friction
+            else
+            {
+                Vector3 velocity_forward = new Vector3(signf(player_velocity.x), 0.0f, signf(player_velocity.z)); velocity_forward.Normalize();
+                player_acceleration -= velocity_forward * decceleration.z;
+            }
         }
 
         // apply acceleration
