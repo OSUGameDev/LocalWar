@@ -5,24 +5,28 @@ using System;
 public class PGOManager : MonoBehaviour
 {
 
-    [SerializeField]
     private bool canGrow = true;            //if the number of objects in the pool can grow or not
 
-    [SerializeField]
     private int pooledAmount = 10;          //the number of objects in the pool
 
-    //contains pool of objects to grab from 
-    private Dictionary<Type, List<GameObject>> pooledObjectsHT;
+    ///contains pool of objects to grab from 
+    private Dictionary<string, List<GameObject>> pooledObjectsHT;
 
-    //used to grow the pool with a clean object (not used repeatdly)
-    private Dictionary<Type, GameObject> pristeneObjects;  
+    ///used to grow the pool with a clean object (not used repeatdly)
+    private Dictionary<string, GameObject> pristeneObjects;  
 
-    // Use this for initialization
+    /// Use this for initialization
     public void Awake() //must be awake because guns were initializing prior to this function call.
     { 
         //initialize the pooled objects, list of lists.
-        pooledObjectsHT = new Dictionary<Type, List<GameObject>>();    
-        pristeneObjects = new Dictionary<Type, GameObject>();
+        pooledObjectsHT = new Dictionary<string, List<GameObject>>();    
+        pristeneObjects = new Dictionary<string, GameObject>();
+    }
+
+    ///<summary>See documentation for more generic GetPooledObject(string key) </summary>
+    public GameObject GetPooledObject(Type objectKey)
+    {
+        return GetPooledObject(objectKey.GUID.ToString());
     }
 
     /// <summary>
@@ -33,7 +37,7 @@ public class PGOManager : MonoBehaviour
     /// This method is to be used by other scripts in the scene.
     /// </summary>
     /// <returns>GameObject Pooled Object</returns>
-    public GameObject GetPooledObject(Type objectKey)
+    public GameObject GetPooledObject(string objectKey)
     {
         if (objectKey == null || !pooledObjectsHT.ContainsKey(objectKey))
         {
@@ -64,16 +68,23 @@ public class PGOManager : MonoBehaviour
         return null;
     }
 
+    ///<summary>
+    ///Pulls the unique identifier for a Type out of the type and uses that as the key.
+    ///</summary>
+    public void InitObject(Type key, GameObject pooledObj){
+        InitObject(key.GUID.ToString(), pooledObj);
+    }
+
     /// <summary>
-    /// Initializes the object with a specific key.
+    /// Initializes the object with a specific key. A copy of the object can accessed by calling GetObject with the key used here.
+    /// Throws error if key already exists.
     /// </summary>
-    /// <returns> ObjectId that will be used get a pooled object. </returns>
-    public bool InitObject(Type key, GameObject pooledObj)
+    public void InitObject(string key, GameObject pooledObj)
     {
         if(pooledObjectsHT.ContainsKey(key))
         {
-            Debug.LogError("PGOManager Error: Object is already initialized.");
-            return false;
+            GameObject conflictingObj = pristeneObjects[key];
+            throw new InvalidOperationException("Object failed to initialize, key is already in use by '" + conflictingObj.GetType().Name + "'. KEY: " + key);
         }
         
         Guid t = pooledObj.GetType().GUID;
@@ -87,15 +98,14 @@ public class PGOManager : MonoBehaviour
             obj.SetActive(false);
             pooledObjectsHT[key].Add(obj);
         }
-
-        return true; //id is the current size of the list-1
     }
+
 
     public override string ToString()
     {
         int tObjects = 0;
         string str = "PooledObjects: " + pooledObjectsHT.Count + ", ObjectNames: [";
-        Type[] keys = new Type[pooledObjectsHT.Keys.Count];
+        string[] keys = new string[pooledObjectsHT.Keys.Count];
         pooledObjectsHT.Keys.CopyTo(keys, 0);
 
         for (int x = 0; x < keys.Length; x++)

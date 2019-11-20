@@ -27,6 +27,7 @@ public class RemoveObjTimer : MonoBehaviour {
 		if(timer.ElapsedMilliseconds > timeout){
 			if(destroy){
 				Destroy(this.gameObject);
+				return;
 			}else{
 				this.gameObject.SetActive(false);
 			}
