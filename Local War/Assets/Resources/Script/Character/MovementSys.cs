@@ -21,7 +21,7 @@ public class MovementSys : NetworkBehaviour
     private int jumps_used = 0;
     public int jump_count = 2;
     public float gravity = 3.2f;
-    public float jump_speed = 4.0f;
+    public float jump_speed = 0.1f;
 
     /* 
      * TODO:
@@ -72,15 +72,20 @@ public class MovementSys : NetworkBehaviour
         input_direction.x = Input.GetAxis("Horizontal");
         input_direction.y = 0.0f;
         input_direction.z = Input.GetAxis("Vertical");
-        Debug.Log(input_direction);
+        //Debug.Log(input_direction);
     }
 
     private void Move()
     {
+		if (kinematic_controller.isGrounded) {
+			jumps_used = 0;
+			player_velocity.y = 0;
+		}
 
         // jumping:
-        if (Input.GetButtonDown("Jump"))
+		if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
         {
+			jumps_used++;
             player_velocity.y += jump_speed;
         }
 
