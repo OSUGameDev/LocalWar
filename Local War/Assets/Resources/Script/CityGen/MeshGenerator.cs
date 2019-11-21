@@ -28,7 +28,6 @@ public class MeshGenerator : NetworkBehaviour
         GenerateMap();
     }
 
-
     public void GenerateMap()
     {
         Random.InitState(seed);
@@ -86,14 +85,14 @@ public class MeshGenerator : NetworkBehaviour
             for (int k = 0; k < mapGenSettings.blockSize; k++)
             {
                 // For every square in the block, as long as that square is free
-                if (block[k + row * mapGenSettings.blockSize] == 0)
+				if (block[k + row * mapGenSettings.blockSize] == 0)
                 {
                     // Randomize next building size
                     buildingSize[0] = Random.Range(mapGenSettings.buildMinSize, mapGenSettings.buildMaxSize + 1);
                     buildingSize[1] = Random.Range(mapGenSettings.buildMinSize, mapGenSettings.buildMaxSize + 1);
 
                     // Extra randomize logic
-                    for (int r = mapGenSettings.buildMinSize - 1; r > 0; r--)
+                    for (int r = mapGenSettings.buildMinSize; r > 0; r--)
                     {
                         if ((buildingSize[0] + i + r) == mapGenSettings.blockSize)
                         {
@@ -105,6 +104,17 @@ public class MeshGenerator : NetworkBehaviour
                         }
                     }
 
+					// Prevent overlap
+					if (block[k + buildingSize[0] + row * mapGenSettings.blockSize] == 1) 
+					{
+						continue;
+					}
+					/*
+					if (block[k + (row * buildingSize[1]) * mapGenSettings.blockSize] == 1) 
+					{
+						continue;
+					}
+					*/
                     // Get necessary vairable points, this could be cleaned up a lot
                     float x1 = xStart + i + mapGenSettings.buildingSpacing;
                     float x2 = Mathf.Min((xStart + i + buildingSize[0] - mapGenSettings.buildingSpacing),

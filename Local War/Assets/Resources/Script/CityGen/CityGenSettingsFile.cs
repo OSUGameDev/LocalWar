@@ -50,7 +50,7 @@ public class MapGenSettings
     /// <summary>
     /// Mininum building height
     /// </summary>
-    public float baseHeight = 1.5f;
+    public float baseHeight = 2.5f;
 
     /// <summary>
     ///  Range above minimum building height
