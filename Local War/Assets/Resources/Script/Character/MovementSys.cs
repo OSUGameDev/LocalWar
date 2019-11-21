@@ -29,6 +29,9 @@ public class MovementSys : NetworkBehaviour
      * Fix jumping.
      * Enable some way to adjust velocity upon collision
      * Make variable speeds possible for strafing/moving forward/moving backwards
+     * Work out the relationship between Force, Friction, Acceleration, and Max Velocity
+     * Disable ramp up/down on keyboard input because it messing with my math. Maybe just get key presses.
+     * Be able to input both strafe directions
     */
     void Start()
     {
