@@ -31,7 +31,6 @@ public class MeshGenerator : NetworkBehaviour
     public void GenerateMap()
     {
         Random.InitState(seed);
-        Debug.Log(seed);
         x_offset = Random.Range(-100, 100);
         z_offset = Random.Range(-100, 100);
 
@@ -104,17 +103,33 @@ public class MeshGenerator : NetworkBehaviour
                         }
                     }
 
+					if (k + buildingSize [1] > mapGenSettings.blockSize) {
+						buildingSize [1] = mapGenSettings.blockSize - k;
+					}
+
+					if (row + buildingSize [0] > mapGenSettings.blockSize) {
+						buildingSize [0] = mapGenSettings.blockSize - row;
+					}
+
 					// Prevent overlap
-					if (block[k + buildingSize[0] + row * mapGenSettings.blockSize] == 1) 
+					Debug.Log("k: " + k + " row: " + row + " bs0:" + buildingSize[0] + " bs1:" + buildingSize[1] + " logicX: " + (k + (row + buildingSize[0] - 1) * mapGenSettings.blockSize) + " LogicZ: " + (k + buildingSize[1] - 1 + row * mapGenSettings.blockSize));
+
+					for (int r = buildingSize[0] - 1; r > 0; r--) 
 					{
-						continue;
+						if (block [k + (r + row) * mapGenSettings.blockSize] == 1) 
+						{
+							buildingSize [0] = buildingSize [0] - 1;
+						}
 					}
-					/*
-					if (block[k + (row * buildingSize[1]) * mapGenSettings.blockSize] == 1) 
+
+					for (int r = buildingSize[1] - 1; r > 0; r--) 
 					{
-						continue;
+						if (block [k + buildingSize[1] - 1 + row * mapGenSettings.blockSize] == 1) 
+						{
+							buildingSize [1] = buildingSize [1] - 1;
+						}
 					}
-					*/
+
                     // Get necessary vairable points, this could be cleaned up a lot
                     float x1 = xStart + i + mapGenSettings.buildingSpacing;
                     float x2 = Mathf.Min((xStart + i + buildingSize[0] - mapGenSettings.buildingSpacing),
@@ -144,17 +159,19 @@ public class MeshGenerator : NetworkBehaviour
                     {
                         for (int r = 0; r < buildingZ; r++)
                         {
-                            // Debug.Log(buildingCounter + ": " + (k + j + ((row + r) * blockSize)));
                             block[k + r + ((row + j) * mapGenSettings.blockSize)] = 1;
                         }
                     }
 
                     // Build Walls
-                    BuildWall(xMid, yMid, z1, buildingX, buildingHeight,mapGenSettings.buildingThickness);
-                    BuildWall(xMid, yMid, z2, buildingX, buildingHeight, mapGenSettings.buildingThickness);
-                    BuildWall(x1, yMid, zMid, mapGenSettings.buildingThickness, buildingHeight, buildingZ);
-                    BuildWall(x2, yMid, zMid, mapGenSettings.buildingThickness, buildingHeight, buildingZ);
-                    BuildCeil(xMid, buildingHeight, zMid, buildingX, mapGenSettings.buildingThickness, buildingZ);
+					if (buildingSize [0] >= mapGenSettings.buildMinSize && buildingSize [1] >= mapGenSettings.buildMinSize) 
+					{
+	                    BuildWall(xMid, yMid, z1, buildingX, buildingHeight,mapGenSettings.buildingThickness);
+	                    BuildWall(xMid, yMid, z2, buildingX, buildingHeight, mapGenSettings.buildingThickness);
+	                    BuildWall(x1, yMid, zMid, mapGenSettings.buildingThickness, buildingHeight, buildingZ);
+	                    BuildWall(x2, yMid, zMid, mapGenSettings.buildingThickness, buildingHeight, buildingZ);
+	                    BuildCeil(xMid, buildingHeight, zMid, buildingX, mapGenSettings.buildingThickness, buildingZ);
+					}
                 }
             }
             row++;

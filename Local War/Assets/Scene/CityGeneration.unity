@@ -431,7 +431,7 @@ MonoBehaviour:
     i14: 0
     i15: 0
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1
 --- !u!23 &1354325972
 MeshRenderer:
   m_ObjectHideFlags: 0
