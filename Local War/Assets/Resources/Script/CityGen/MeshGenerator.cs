@@ -194,18 +194,18 @@ public class MeshGenerator : NetworkBehaviour
 		Color red = new Vector4 (0, color, .5f+color);
 		int choice = Random.Range (0, 10);
 		var cubeRenderer = cube.GetComponent<Renderer>();
-		if (choice <= 1) 
-		{
-			cubeRenderer.material.SetColor("_Color", yellow);
-		}
+		if (choice <= 1)
+        {
+            cubeRenderer.material.SetColor("_Color", yellow);
+        }
 		else if (choice >= 7) 
-		{
-			cubeRenderer.material.SetColor("_Color", red);
-		}
+        {
+            cubeRenderer.material.SetColor("_Color", red);
+        }
 		else 
-		{
-			cubeRenderer.material.SetColor("_Color", teal);
-		}
+        {
+            cubeRenderer.material.SetColor("_Color", teal);
+        }
     }
 
 	void BuildCeil(float px, float py, float pz, float sx, float sy, float sz)
