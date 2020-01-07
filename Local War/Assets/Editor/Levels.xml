@@ -1,8 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<LevelInfoCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<LevelInfoCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <levels>
     <LevelInfo Name="SampleScene">
       <path>Assets/Scene/SampleScene.unity</path>
+    </LevelInfo>
+    <LevelInfo Name="CityGeneration">
+      <path>Assets/Scene/CityGeneration.unity</path>
+    </LevelInfo>
+    <LevelInfo Name="Arena">
+      <path>Assets/Scene/Arena.unity</path>
     </LevelInfo>
   </levels>
 </LevelInfoCollection>
