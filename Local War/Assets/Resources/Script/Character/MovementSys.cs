@@ -20,19 +20,9 @@ public class MovementSys : NetworkBehaviour
 
     private int jumps_used = 0;
     public int jump_count = 2;
-    public float gravity = 3.2f;
-    public float jump_speed = 0.1f;
+    float gravity = 0.7f;
+    float jump_speed = 0.3f;
 
-    /* 
-     * TODO:
-     * Turn acceleration into a force. Right now the units don't match whats happening.
-     * Fix jumping.
-     * Enable some way to adjust velocity upon collision
-     * Make variable speeds possible for strafing/moving forward/moving backwards
-     * Work out the relationship between Force, Friction, Acceleration, and Max Velocity
-     * Disable ramp up/down on keyboard input because it messing with my math. Maybe just get key presses.
-     * Be able to input both strafe directions
-    */
     void Start()
     {
         acceleration        = new Vector3(1.8f, 0.0f, 1.8f);
@@ -72,7 +62,6 @@ public class MovementSys : NetworkBehaviour
         input_direction.x = Input.GetAxis("Horizontal");
         input_direction.y = 0.0f;
         input_direction.z = Input.GetAxis("Vertical");
-        //Debug.Log(input_direction);
     }
 
     private void Move()
@@ -86,6 +75,11 @@ public class MovementSys : NetworkBehaviour
 		if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
         {
 			jumps_used++;
+            // zero out jump velocity if falling
+            if(player_velocity.y < 0.0f)
+            {
+                player_velocity.y = 0.0f;
+            }
             player_velocity.y += jump_speed;
         }
 
@@ -106,9 +100,11 @@ public class MovementSys : NetworkBehaviour
             player_velocity += movement_forward * acceleration.z * input_direction.z * Time.deltaTime;
         }
 
-        // kinetic friction
-        Vector3 opposite_velocity = new Vector3(-player_velocity.x, 0.0f, -player_velocity.z);
-        player_velocity += opposite_velocity * kinetic_friction;
+        // friction
+        Vector3 friction = new Vector3(-player_velocity.x * kinetic_friction, 
+                                       -player_velocity.y * air_friction, 
+                                       -player_velocity.z * kinetic_friction);
+        player_velocity += friction;
 
         // gravity
         player_velocity.y -= gravity * Time.deltaTime;
