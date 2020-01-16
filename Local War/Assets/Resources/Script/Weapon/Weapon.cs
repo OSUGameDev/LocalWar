@@ -8,8 +8,8 @@ public class Weapon : MonoBehaviour {
     protected int           type;
     protected string        description;
     protected WeaponSys     playerWeaponSys;
-    protected bool          isShooting;
-    protected bool          isFinishShoot;
+    protected bool          isAttacking;
+    protected bool          finishedAttacking;
     public    GameObject    customUI;
     protected GameObject    customUIInstance;
 
@@ -18,7 +18,7 @@ public class Weapon : MonoBehaviour {
 
     }
 
-    public virtual void Shoot(Vector3 destination)
+    public virtual void Attack(Vector3 destination)
     {
 
     }
@@ -43,13 +43,18 @@ public class Weapon : MonoBehaviour {
     }
 
     //Checking function, only runs on server
-    public bool IsShooting()
+    public bool IsAttacking()
     {
-        return isShooting;
+        return isAttacking;
     }
 
     void Start()
     {
 
+    }
+
+    public void SetAudio(AudioClip sound)
+    {
+        fireSound = sound;
     }
 }

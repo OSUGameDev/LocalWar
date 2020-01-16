@@ -58,14 +58,14 @@ public class LaserRifle : RangeWeapon {
     //This function will be called by the weaponSys script when player pull the trigger
     public override void Fire()
     {
-        if (!isShooting)
+        if (!isAttacking)
         {
-            isShooting = true;
+            isAttacking = true;
             isCharging = true;
         }
     }
 
-    public override void Shoot(Vector3 destination)
+    public override void Attack(Vector3 destination)
     {
         GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
         Ammo script = bullet.GetComponent<Ammo>();
@@ -80,7 +80,7 @@ public class LaserRifle : RangeWeapon {
         accuracy = 0.4f;
         coolDown = 2.0f;
         isCharging = false;
-        isFinishShoot = false;
+        finishedAttacking = false;
     }
 	
 	// Update is called once per frame
@@ -117,7 +117,7 @@ public class LaserRifle : RangeWeapon {
             accuracy = 0.4f;
             coolDownCounter = coolDown;
             RepositionUI();
-            isFinishShoot = true;
+            finishedAttacking = true;
         }
     }
 }

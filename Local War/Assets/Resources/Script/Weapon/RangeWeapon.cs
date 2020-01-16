@@ -17,20 +17,20 @@ public class RangeWeapon : Weapon{
     //The count down function, used after each shot
     protected void CoolDown()
     {
-        if (isShooting)
+        if (isAttacking)
         {
             coolDownCounter -= Time.fixedDeltaTime;
             if (coolDownCounter <= 0)
             {
-                isShooting = false;
-                isFinishShoot = false;
+                isAttacking = false;
+                finishedAttacking = false;
             }
         }
     }
 
     // Update is called once per frame
     void FixedUpdate () {
-        if(isFinishShoot)
+        if(finishedAttacking)
             CoolDown();     
 	}
 }

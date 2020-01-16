@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEditor;
+using System.IO;
 
 public class MainMenu : MonoBehaviour {
 
     public GameObject CurrentMenu;
     public List<GameObject> Menus = new List<GameObject>();
     public GameObject NetworkManagerPrefab;
+    public Dropdown LevelDropDown;
     private GameObject NetworkManager;
+
+    public LevelInfo[] PlayableLevels;
 
 	// Use this for initialization
 	void Start () {
@@ -23,10 +28,19 @@ public class MainMenu : MonoBehaviour {
         DontDestroyOnLoad(NetworkManager);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        if(Application.isBatchMode)
+        {
+            Application.targetFrameRate = 30;
+            NetworkManager.GetComponent<NetworkManager>().StartServer();
+        }
+        PlayableLevels = LevelInfoCollection.DefaultLevels;
+        foreach (var scene in PlayableLevels)
+            LevelDropDown.options.Add(new Dropdown.OptionData(scene.Name));
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
     }
 
     Stack<GameObject> MenuStack;
@@ -72,6 +86,9 @@ public class MainMenu : MonoBehaviour {
     public void HostServer()
     {
         Debug.Log("Hosting Server");
+
+
+        NetworkManager.GetComponent<NetworkManager>().onlineScene = PlayableLevels[LevelDropDown.value].Name;
         NetworkManager.GetComponent<NetworkManager>().StartHost();
     }
 

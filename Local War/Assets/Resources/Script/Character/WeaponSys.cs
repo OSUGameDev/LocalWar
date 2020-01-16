@@ -35,6 +35,8 @@ public class WeaponSys : NetworkBehaviour {
         if(isLocalPlayer)
         {
 
+            CmdFire();
+
         }
     }
 
@@ -48,6 +50,11 @@ public class WeaponSys : NetworkBehaviour {
     //This will called on all instance of this player
     void RpcFire()
     {
+        //Get the access to the target
+        RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
+
+        SoundSys.PlaySound(script.fireSound);
+
         //Set the camera then perform attack
         currentWeapon.SetPlayer(this);
         currentWeapon.Fire();
@@ -90,7 +97,7 @@ public class WeaponSys : NetworkBehaviour {
     public void RpcDrawbullet(Vector3 destination)
     {
         Debug.Log("Triggered on client!");
-        currentWeapon.Shoot(destination);
+        currentWeapon.Attack(destination);
     }
 
 
