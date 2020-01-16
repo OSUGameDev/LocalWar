@@ -52,7 +52,6 @@ public class WeaponSys : NetworkBehaviour {
     {
         //Get the access to the target
         RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
-
         SoundSys.PlaySound(script.attackSound);
 
         //Set the camera then perform attack
@@ -105,7 +104,7 @@ public class WeaponSys : NetworkBehaviour {
     void Start ()
     {
         //Initialize the objects
-        playerCam = transform.Find("Head").Find("Main Camera").GetComponent<Camera>();
+        playerCam = transform.Find("Head/Main Camera").GetComponent<Camera>();
         weaponList = transform.Find("Head").Find("Weapons").gameObject;
 
         /*****Initialize the weapon*****/
