@@ -48,6 +48,7 @@ public class WeaponSys : NetworkBehaviour {
         if(hasAuthority)
         if (Input.GetButton("Fire1"))
         {
+
             CmdFire();
 
         }
@@ -64,6 +65,8 @@ public class WeaponSys : NetworkBehaviour {
     {
         //Get the access to the target
         RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
+
+        SoundSys.PlaySound(script.fireSound);
 
         //Set the camera then perform attack
         script.SetCamera(playerCam);

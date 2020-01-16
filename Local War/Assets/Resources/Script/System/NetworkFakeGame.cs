@@ -13,6 +13,7 @@ public class NetworkFakeGame : MonoBehaviour {
             return;
         }
         Instantiate(Resources.Load<GameObject>("Prefab/Networking/NetworkManager"));
+        NetworkManager.singleton.onlineScene = null;
         NetworkManager.singleton.StartHost();
 	}
 	
