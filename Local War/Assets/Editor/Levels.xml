@@ -4,5 +4,8 @@
     <LevelInfo Name="SampleScene">
       <path>Assets/Scene/SampleScene.unity</path>
     </LevelInfo>
+    <LevelInfo Name="CityGeneration">
+      <path>Assets/Scene/CityGeneration.unity</path>
+    </LevelInfo>
   </levels>
 </LevelInfoCollection>
