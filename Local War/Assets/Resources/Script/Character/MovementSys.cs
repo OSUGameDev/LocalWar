@@ -35,7 +35,9 @@ public class MovementSys : NetworkBehaviour
         mouse_axis          = new Vector2();
 
         kinematic_controller = GetComponent<CharacterController>();
-        transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
+
+        //gets camera relative to player object
+        transform.Find("Head/Main Camera").GetComponent<Camera>().enabled = hasAuthority;
         if (hasAuthority)
         {
             Cursor.lockState = CursorLockMode.Locked;

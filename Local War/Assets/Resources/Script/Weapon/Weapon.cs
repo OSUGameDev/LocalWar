@@ -1,26 +1,62 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class Weapon : MonoBehaviour {
-    protected int       id;
-    protected int       type;
-    protected string    description;
-    protected Camera    playerCame;
-    public AudioClip    fireSound;
+    protected int           id;
+    protected int           type;
+    protected string        description;
+    protected WeaponSys     playerWeaponSys;
+    protected bool          isAttacking;
+    protected bool          finishedAttacking;
+    public    GameObject    customUI;
+    protected GameObject    customUIInstance;
+
+    public AudioClip attackSound;
+
+    public virtual void Fire()
+    {
+
+    }
+
+    public virtual void Attack(Vector3 destination)
+    {
+
+    }
 
     public void SetDescription(string des)
     {
         description = des;
     }
 
-    public void SetCamera(Camera targetCamera)
+    //The function to set current weapon's camera, used to Aimming, only runs on server
+    public void SetPlayer(WeaponSys targetPlayer)
     {
-        playerCame = targetCamera;
+        playerWeaponSys = targetPlayer;
+    }
+
+    public virtual GameObject CustomUI()
+    {
+        if(customUIInstance != null)
+            customUIInstance.SetActive(true);
+        //Return the instance
+        return customUIInstance;
+    }
+
+    //Checking function, only runs on server
+    public bool IsAttacking()
+    {
+        return isAttacking;
+    }
+
+    void Start()
+    {
+
     }
 
     public void SetAudio(AudioClip sound)
     {
-        fireSound = sound;
+        attackSound = sound;
     }
 }

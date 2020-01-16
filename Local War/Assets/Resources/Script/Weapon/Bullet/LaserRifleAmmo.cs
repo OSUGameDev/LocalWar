@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class LaserAmmo : Ammo {
+public class LaserRifleAmmo : Ammo {
 
-    public      float           maxRadius;
+    public float maxRadius;
 
-    private     float           angle;
-    private     Vector3         destination;
-    private     LineRenderer    line;
+    private float angle;
+    private Vector3 destination;
+    private LineRenderer line;
 
     public override void initialize(Vector3 destination)
     {
@@ -23,25 +23,25 @@ public class LaserAmmo : Ammo {
 
     public override float returnDmg()
     {
-        return 15.0f;
+        return 45.0f;
     }
 
-    void Start ()
+    void Start()
     {
         line.startWidth = 0;
         line.endWidth = 0;
         angle = 0;
-        maxRadius = 0.01f;
+        maxRadius = 0.05f;
+        damage = 45.0f;
     }
 
-    void FixedUpdate ()
+    void FixedUpdate()
     {
         line.startWidth = Mathf.Sin(angle) * maxRadius;
         line.endWidth = Mathf.Sin(angle) * maxRadius;
 
-        angle += Mathf.PI * 10 / 180;
+        angle += Mathf.PI * 15 / 180;
         if (angle >= Mathf.PI)
             Destroy(gameObject);
     }
-
 }
