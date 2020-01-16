@@ -74,7 +74,7 @@ public class MovementSys : NetworkBehaviour
         // jumping:
 		if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
         {
-			jumps_used++;
+			// jumps_used++;
             // zero out jump velocity if falling
             if(player_velocity.y < 0.0f)
             {
