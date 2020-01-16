@@ -13,6 +13,8 @@ public class Weapon : MonoBehaviour {
     public    GameObject    customUI;
     protected GameObject    customUIInstance;
 
+    public AudioClip attackSound;
+
     public virtual void Fire()
     {
 
@@ -55,6 +57,6 @@ public class Weapon : MonoBehaviour {
 
     public void SetAudio(AudioClip sound)
     {
-        fireSound = sound;
+        attackSound = sound;
     }
 }

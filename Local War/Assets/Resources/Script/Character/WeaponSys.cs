@@ -53,7 +53,7 @@ public class WeaponSys : NetworkBehaviour {
         //Get the access to the target
         RangeWeapon script = currentWeapon.GetComponent<RangeWeapon>();
 
-        SoundSys.PlaySound(script.fireSound);
+        SoundSys.PlaySound(script.attackSound);
 
         //Set the camera then perform attack
         currentWeapon.SetPlayer(this);
