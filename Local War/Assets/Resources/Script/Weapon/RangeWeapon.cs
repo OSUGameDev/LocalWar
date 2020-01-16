@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RangeWeapon : Weapon{
-
+    public  Text    projectDamage;
     private int     ammo;
     private int     magzine;
     private int     totalAmmo;
@@ -25,10 +26,16 @@ public class RangeWeapon : Weapon{
         {
             GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
             LaserAmmo script = bullet.GetComponent<LaserAmmo>();
+            if(script.hitTarget==true)
+            {
+                //project damage from bullet on target. Only visible to player. 
+                }
+
             script.setOrigin(firePoint.transform.position);
             script.initialize(hit.point, isServer);
             isShooting = true;
             coolDownCounter = coolDown;
+
         }
     }
     

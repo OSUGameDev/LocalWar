@@ -5,7 +5,7 @@ using UnityEditor;
 
 public abstract class Ammo : MonoBehaviour {
 
-    protected   float       damage;
+    public   float       damage;
     protected   Vector3     origin;
 
     public void setOrigin(Vector3 originPoint)

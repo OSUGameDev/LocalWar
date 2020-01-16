@@ -5,7 +5,7 @@ using UnityEngine;
 public class LaserAmmo : Ammo {
 
     public      float           maxRadius;
-
+    public      bool            hitTarget;
     private     float           angle;
     private     Vector3         destination;
     private     LineRenderer    line;
@@ -30,6 +30,7 @@ public class LaserAmmo : Ammo {
             LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
             if (target != null)
             {
+                hitTarget = true;
                 Debug.Log(maxRadius);
                 target.InflictDamage(damage);
             }
@@ -38,6 +39,7 @@ public class LaserAmmo : Ammo {
 
     void Start ()
     {
+        hitTarget = false;    
         line.startWidth = 0;
         line.endWidth = 0;
         angle = 0;
