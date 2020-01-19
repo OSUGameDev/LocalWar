@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scene/CityGeneration.unity
     guid: cd0c2bc22b753464293b244c816d08f9
+  - enabled: 1
+    path: Assets/Scene/WFC City.unity
+    guid: abca5a82f125be54f83f5c696d5b32e6
   m_configObjects: {}
