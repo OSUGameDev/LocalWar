@@ -7,7 +7,21 @@ using System;
 
 public class MapBehavior : MonoBehaviour
 {
-    public int MapHeight = 6;
-    public int MapLength = 20;
-    public int MapWidth = 20;
+    public int mapHeight = 6;
+    public int mapLength = 20;
+    public int mapWidth = 20;
+
+    GameObject prefab;
+
+    public void GenerateMap()
+    {
+        for (int i = 0; i < mapLength; i++)
+        {
+            for (int k = 0; k < mapLength; k++)
+            {
+
+            }
+        }
+    }
+
 }
