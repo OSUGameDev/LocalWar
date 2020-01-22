@@ -6,14 +6,15 @@ using UnityEngine.Networking;
 public class MovementSys : NetworkBehaviour
 {
     private Vector3 player_velocity;
+    private Vector3 max_player_speed;
     private Vector3 player_acceleration;
     private Vector3 previous_input_direction;
     private Vector3 input_direction;
     private Vector2 previous_mouse_axis;
     private Vector2 mouse_axis;
 
-    private Vector3 force = new Vector3(18.0f, 0.0f, 18.0f);
-    private float kinetic_friction = 0.12f;
+    private Vector3 force = new Vector3(120.0f, 0.0f, 120.0f);
+    private float kinetic_friction_constant = 0.12f;
     private float air_friction = 0.01f;
     private int jumps_used = 0;
     private int jump_count = 2;
@@ -84,6 +85,11 @@ public class MovementSys : NetworkBehaviour
         // movement:
         // acceleration
         Vector3 acceleration = force / mass;
+        // max speed
+        for (int sdx = 0; sdx < 3; sdx++)
+        {
+            max_player_speed[sdx] = acceleration[sdx] * Time.deltaTime * (1.0f / kinetic_friction_constant - 1.0f);
+        }
 
         // strafing
         if ( input_direction.x != 0.0f )
@@ -105,10 +111,10 @@ public class MovementSys : NetworkBehaviour
         }
 
         // friction
-        Vector3 friction = new Vector3(-player_velocity.x * kinetic_friction, 
-                                       -player_velocity.y * air_friction, 
-                                       -player_velocity.z * kinetic_friction);
-        player_velocity += friction;
+        Vector3 friction_velocity = new Vector3(-player_velocity.x * kinetic_friction_constant, 
+                                                -player_velocity.y * kinetic_friction_constant, 
+                                                -player_velocity.z * kinetic_friction_constant);
+        player_velocity += friction_velocity;
 
         // gravity
         player_velocity.y -= gravity * Time.deltaTime;
