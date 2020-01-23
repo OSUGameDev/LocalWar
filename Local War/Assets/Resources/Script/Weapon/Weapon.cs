@@ -7,6 +7,7 @@ public class Weapon : MonoBehaviour {
     protected int       type;
     protected string    description;
     protected Camera    playerCame;
+    public AudioClip    fireSound;
 
     public void SetDescription(string des)
     {
@@ -16,5 +17,10 @@ public class Weapon : MonoBehaviour {
     public void SetCamera(Camera targetCamera)
     {
         playerCame = targetCamera;
+    }
+
+    public void SetAudio(AudioClip sound)
+    {
+        fireSound = sound;
     }
 }
