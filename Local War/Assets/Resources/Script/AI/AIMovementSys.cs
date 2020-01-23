@@ -4,23 +4,50 @@ using UnityEngine;
 
 public class AIMovementSys : MonoBehaviour{
 
-    private float speed = 2.0F;          //the moving speed of the character
-    private float jumpSpeed = 10.0f;      //the jump force of the character
-    private float rotateSpeed = 100.0f;
+    [SerializeField] private float speed = 2.0F;          //the moving speed of the character
+    [SerializeField] private float jumpSpeed = 10.0f;      //the jump force of the character
+    [SerializeField] private float rotateSpeed = 100.0f;
 
-    private float gravity = 20.0f;       //the force of gravity on the character
+    [SerializeField] private float gravity = 20.0f;       //the force of gravity on the character
 
     private float groundOffset = .2f;    //the offset for the IsGrounded check. Useful for recognizing slopes and imperfect ground.
 
-    private float moveH, moveV;
-    private float mouseX, mouseY;
     private Vector3 moveDirection = Vector3.zero;   //the direction the character should move.
     private Vector3 jumpDirection = Vector3.zero;
     private Quaternion rotationStart, rotationEnd;
+
+    public Transform TargetPosition;//Starting position to pathfind to
     public Vector3 nextDestination;
+    private Vector3 LastPositon;
+    private bool isPathing;
+    private bool needPath;
+    [SerializeField] private float recalculationDistance;
+    UnityEngine.AI.NavMeshAgent agent;
+
 
     private Rigidbody rb;
 
+        private void Awake()//When the program starts
+    {
+        rb = GetComponent<Rigidbody>();
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        
+    }
+
+    private void Update()//Every frame
+    {
+
+        TargetPosition = GameObject.FindGameObjectWithTag("Player").transform;
+        Vector3 temp = transform.position;
+        //if the target has moved more than recalculation distance from the original destination
+        Vector2 targetMoved = new Vector2(TargetPosition.position.x - LastPositon.x,TargetPosition.position.z-LastPositon.z);
+        if(targetMoved.magnitude > recalculationDistance){
+            isPathing = true;
+            //FindPath(temp, TargetPosition.position);
+            agent.destination = TargetPosition.position; 
+        }
+        isPathing = false;
+    }
 
     ///The check to see if the character is currently on the ground.
     private bool isGrounded()
@@ -65,15 +92,4 @@ public class AIMovementSys : MonoBehaviour{
     }
 
     //This built-in function will be called after the script first time loaded into the scene
-    void Start()
-    {
-       rb = gameObject.GetComponent<Rigidbody>();
-        
-    }
-
-    void Update()
-    {
-        nextDestination = GetComponent<AstarPathfinding>().nextDestination; // get current node in astar graph
-        move();
-    }
 }

@@ -3,82 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class MovementSys : NetworkBehaviour {
+public class MovementSys : NetworkBehaviour
+{
+    private Vector3 player_velocity;
+    private Vector3 player_acceleration;
+    public Vector3  acceleration;
+    public float    kinetic_friction;
+    public float    air_friction;
+    private Vector3 previous_input_direction;
+    private Vector3 input_direction;
+    private Vector2 previous_mouse_axis;
+    private Vector2 mouse_axis;
+    public float sensitivity = 100.0f;
 
-    private float speed = 2.0F;          //the moving speed of the character
-    private float jumpSpeed = 10.0f;      //the jump force of the character
-    private float rotateSpeed = 100.0f;
+    private CharacterController kinematic_controller;
 
-    private float gravity = 20.0f;       //the force of gravity on the character
+    private int jumps_used = 0;
+    public int jump_count = 2;
+    float gravity = 0.7f;
+    float jump_speed = 0.3f;
 
-    private float groundOffset = .2f;    //the offset for the IsGrounded check. Useful for recognizing slopes and imperfect ground.
-
-    private float moveH, moveV;
-    private float mouseX, mouseY;
-    private Vector3 moveDirection = Vector3.zero;   //the direction the character should move.
-    private Vector3 jumpDirection = Vector3.zero;
-    private Quaternion rotationStart, rotationEnd;
-
-    private CharacterController controller;
-
-
-    ///The check to see if the character is currently on the ground.
-    private bool isGrounded()
-    {
-        RaycastHit hit;
-        Physics.Raycast(this.transform.position, -this.transform.up, out hit, 10);   //A short ray shot directly downward from the center of the character.
-
-        if (System.Math.Abs(hit.distance) < System.Single.Epsilon)                                           //if the distance is zero, the ray probably did not hit anything.
-        {
-            return false;
-        }
-        if (hit.distance <= (this.transform.lossyScale.y / 2 + groundOffset))   //if the distance from the ray is less than half the height 
-        {                                                                   //of the character (plus the offset), the character us grounded.
-            return true;
-        }
-        return false;
-    }
-
-    private void move()
-    {
-        /*****Get basic player input*****/
-        moveH = Input.GetAxis("Horizontal");
-        moveV = Input.GetAxis("Vertical");
-        mouseX += Input.GetAxis("Mouse X") * rotateSpeed * Time.deltaTime;
-        mouseY -= Input.GetAxis("Mouse Y") * rotateSpeed * Time.deltaTime;
-        mouseY = Mathf.Clamp(mouseY, -90, 90);
-
-        rotationStart = transform.rotation;
-        rotationEnd = Quaternion.Euler(mouseY, mouseX, 0f);
-        transform.rotation = Quaternion.Lerp(rotationStart, rotationEnd, 0.5f);
-
-        moveDirection = new Vector3(moveH, 0.0f, moveV);       //Create the player's movement from keyboard in local space
-        moveDirection = transform.TransformDirection(moveDirection);      //Transform the moveMent from local space to world space
-        moveDirection *= speed;      //Based on base speed
-
-        /*****Check jump mode at last*****/
-        if (Input.GetButtonDown("Jump"))               //jump if the character is grounded and the user presses the jump button.
-        {
-            jumpDirection.y = jumpSpeed;     //Give a jump speed to player
-        }
-
-
-        /*****Move the player*****/
-        controller.Move(moveDirection * Time.deltaTime);    //move the character based on the gravitational force.
-        if (!controller.isGrounded)
-        {
-            jumpDirection.y -= gravity * Time.deltaTime;
-        }
-        controller.Move(jumpDirection * Time.deltaTime);
-    }
-
-    //This built-in function will be called after the script first time loaded into the scene
     void Start()
     {
-        mouseX = 0;
-        mouseY = 0;
+        acceleration        = new Vector3(1.8f, 0.0f, 1.8f);
+        kinetic_friction    = 0.35f;
+        air_friction        = 0.01f;
 
-        controller = GetComponent<CharacterController>();
+        player_velocity     = new Vector3();
+        player_acceleration = new Vector3();
+        input_direction     = new Vector2();
+        mouse_axis          = new Vector2();
+
+        kinematic_controller = GetComponent<CharacterController>();
         transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
         if (hasAuthority)
         {
@@ -87,16 +43,99 @@ public class MovementSys : NetworkBehaviour {
         }
     }
 
+    private void GetInput()
+    {
+        // states
+        previous_input_direction = input_direction;
+        previous_mouse_axis = mouse_axis;
+
+        // looking 
+        // TODO: break modifying mouse movement from getting input
+        mouse_axis.x += Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
+        mouse_axis.y -= Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
+        mouse_axis.y = Mathf.Clamp(mouse_axis.y, -89.999f, 89.999f);
+        Quaternion rotation_start = transform.rotation;
+        Quaternion rotation_end = Quaternion.Euler(mouse_axis.y, mouse_axis.x, 0.0f);
+        transform.rotation = Quaternion.Lerp(rotation_start, rotation_end, 0.5f);
+
+        // movement
+        input_direction.x = Input.GetAxis("Horizontal");
+        input_direction.y = 0.0f;
+        input_direction.z = Input.GetAxis("Vertical");
+    }
+
+    private void Move()
+    {
+		if (kinematic_controller.isGrounded) {
+			jumps_used = 0;
+			player_velocity.y = 0;
+		}
+
+        // jumping:
+		if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
+        {
+			jumps_used++;
+            // zero out jump velocity if falling
+            if(player_velocity.y < 0.0f)
+            {
+                player_velocity.y = 0.0f;
+            }
+            player_velocity.y += jump_speed;
+        }
+
+        // movement:
+
+        // strafing
+        if ( input_direction.x != 0.0f )
+        {
+            Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
+            Vector3 movement_cross = Vector3.Cross(movement_forward, Vector3.up);
+            player_velocity -= movement_cross * acceleration.x * input_direction.x * Time.deltaTime;
+        }
+
+        // forward/backwards
+        if (input_direction.z != 0.0f)
+        {
+            Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
+            player_velocity += movement_forward * acceleration.z * input_direction.z * Time.deltaTime;
+        }
+
+        // friction
+        Vector3 friction = new Vector3(-player_velocity.x * kinetic_friction, 
+                                       -player_velocity.y * air_friction, 
+                                       -player_velocity.z * kinetic_friction);
+        player_velocity += friction;
+
+        // gravity
+        player_velocity.y -= gravity * Time.deltaTime;
+
+        // apply movement
+        kinematic_controller.Move(player_velocity);
+    }
+
     void Update()
     {
         if (!hasAuthority)
             return;
-        move();
-        if(Input.GetKeyDown(KeyCode.Escape))
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             NetworkManager.singleton.StopClient();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        GetInput();
+        Move();
+    }
+
+    private int signf( float val )
+    {
+        if (val == 0) return 0;
+        else if (val > 0) return 1;
+        else return -1;
     }
 }
