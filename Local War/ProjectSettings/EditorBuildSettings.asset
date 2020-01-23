@@ -12,9 +12,9 @@ EditorBuildSettings:
     path: Assets/Scene/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scene/Arena.unity
+    path: Assets/Scene/Arena/Arena.unity
     guid: b361d23e002e0244fb3460296be29aed
   - enabled: 1
-    path: Assets/Scene/CityGeneration.unity
+    path: Assets/Scene/CityGeneration/CityGeneration.unity
     guid: cd0c2bc22b753464293b244c816d08f9
   m_configObjects: {}

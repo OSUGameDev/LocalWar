@@ -188,6 +188,8 @@ public class MeshGenerator : NetworkBehaviour
         cube.transform.localScale = new Vector3(sx, sy, sz);
         cube.GetComponent<MeshRenderer>().material = newMat;
         cube.AddComponent<ReCalcCubeTexture>();
+        //cube.AddComponent<NavMeshObstacle>(); //Added by zack for the future
+        //cube.GetComponent<NavMeshObstacle>().shape = "square";
 		float color = Random.Range (0.0f, 0.5f);
 		Color teal = new Vector4 (0, .5f+color, .5f+color);
 		Color yellow = new Vector4 (0, .5f+color, color);
