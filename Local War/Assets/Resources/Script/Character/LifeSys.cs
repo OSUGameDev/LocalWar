@@ -67,6 +67,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
         if(hasAuthority)
         {
             GameObject.Find("RespawnCamera").GetComponent<Camera>().enabled = true;
+            GameObject.Find("RespawnCamera").GetComponent<AudioListener>().enabled = true;
         }
     }
 
@@ -76,14 +77,21 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
         gameObject.SetActive(true);
     }
 
+    protected virtual Transform getSpawnLocation()
+    {
+        return GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform;
+    }
+
     [ClientRpc]
     private void RpcSpawn()
     {
         if (hasAuthority)
         {
-            transform.position = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.position;
-            transform.rotation = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.rotation;
+            var spawnPos = getSpawnLocation();
+            transform.position = spawnPos.position;
+            transform.rotation = spawnPos.rotation;
             GameObject.Find("RespawnCamera").GetComponent<Camera>().enabled = false;
+            GameObject.Find("RespawnCamera").GetComponent<AudioListener>().enabled = false;
         }
         gameObject.SetActive(true);
     }
@@ -107,7 +115,15 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     }
 
     [Server]
-    public virtual void InflictDamage(float dmg, int team)
+    public virtual void Kill(DateTime overrideRespawnTime)
+    {
+        gameObject.SetActive(false);
+        RpcKill();
+        RespawnManager.singleton.QueueRespawn(overrideRespawnTime, this);
+    }
+
+    [Server]
+    public virtual void InflictDamage(float dmg, int playerHashCode)
     {
         RpcClientDamaged(dmg);
         if (shield > 0)
@@ -139,6 +155,6 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
         _shield = 100.0f;
     }
 
-	void Update () {
+	protected virtual void Update () {
 	}
 }

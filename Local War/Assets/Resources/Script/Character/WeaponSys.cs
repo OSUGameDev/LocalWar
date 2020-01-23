@@ -73,7 +73,7 @@ public class WeaponSys : NetworkBehaviour {
 
         //Set the camera then perform attack
         script.SetCamera(playerCam);
-        script.Fire(isServer, currentCharacter.info.Team);
+        script.Fire(isServer, currentCharacter.info.HashCode);
     }
 
 }

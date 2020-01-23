@@ -14,7 +14,7 @@ public class RangeWeapon : Weapon{
     public GameObject ammoType;
     public GameObject firePoint;
 
-    public void Fire(bool isServer, int team)
+    public void Fire(bool isServer, int playerHashCode)
     {
         //Cast a ray from center of the camera
         Ray ray = playerCame.ViewportPointToRay(new Vector3(0.5F, 0.5F, 0));
@@ -26,7 +26,7 @@ public class RangeWeapon : Weapon{
             GameObject bullet = Instantiate(ammoType, firePoint.transform.position, firePoint.transform.rotation);
             LaserAmmo script = bullet.GetComponent<LaserAmmo>();
             script.setOrigin(firePoint.transform.position);
-            script.initialize(hit.point, isServer, team);
+            script.initialize(hit.point, isServer, playerHashCode);
             isShooting = true;
             coolDownCounter = coolDown;
         }

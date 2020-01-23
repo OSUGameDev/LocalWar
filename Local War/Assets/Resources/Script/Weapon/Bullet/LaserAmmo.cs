@@ -11,7 +11,7 @@ public class LaserAmmo : Ammo
     private Vector3 destination;
     private LineRenderer line;
 
-    public void initialize(Vector3 direction, bool isServer, int team)
+    public void initialize(Vector3 direction, bool isServer, int playerHashCode)
     {
         damage = 15.0f;
 
@@ -32,7 +32,7 @@ public class LaserAmmo : Ammo
             if (target != null)
             {
                 Debug.Log(maxRadius);
-                target.InflictDamage(damage, team);
+                target.InflictDamage(damage, playerHashCode);
             }
         }
     }
