@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 public class LifeSys : NetworkBehaviour, ISpawnable {
 
-    public static LifeSys playerLifeSystem;
+    
     public TimeSpan respawnTime = new TimeSpan(0, 0, 10);
 
     /// <summary>
@@ -57,12 +57,10 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
 
     public DateTime nextSpawnTime;
 
-    //private List<Buff>      buffList;
-    //private List<Debuff>    debuffList;
 
 
     [ClientRpc]
-    private void RpcKill()
+    protected virtual void RpcKill()
     {
         nextSpawnTime = DateTime.Now + respawnTime;
         gameObject.SetActive(false);
@@ -101,7 +99,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     }
 
     [Server]
-    public void Kill()
+    public virtual void Kill()
     {
         gameObject.SetActive(false);
         RpcKill();
@@ -109,7 +107,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     }
 
     [Server]
-    public void InflictDamage(float dmg)
+    public virtual void InflictDamage(float dmg, int team)
     {
         RpcClientDamaged(dmg);
         if (shield > 0)
@@ -136,11 +134,9 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
         Spawn(100, 100);
     }
 
-    void Start () {
+    protected virtual void Start () {
         _health = 100.0f;
         _shield = 100.0f;
-        if (hasAuthority)
-            playerLifeSystem = this;
     }
 
 	void Update () {

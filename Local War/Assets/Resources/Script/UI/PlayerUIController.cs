@@ -19,10 +19,10 @@ public class PlayerUIController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (LifeSys.playerLifeSystem == null)
+        if (CharacterLifeSystems.LocalPlayer == null)
             return;
 
-        if (LifeSys.playerLifeSystem.gameObject.activeSelf)
+        if (CharacterLifeSystems.LocalPlayer.gameObject.activeSelf)
         {
             if(!IsPlayerActive)
             {
@@ -31,8 +31,8 @@ public class PlayerUIController : MonoBehaviour {
                 RespawnText.enabled = false;
                 Crosshair.SetActive(true);
             }
-            ShieldText.text = "Shield: " + LifeSys.playerLifeSystem.shield;
-            HealthText.text = "Health: " + LifeSys.playerLifeSystem.health;
+            ShieldText.text = "Shield: " + CharacterLifeSystems.LocalPlayer.shield;
+            HealthText.text = "Health: " + CharacterLifeSystems.LocalPlayer.health;
             IsPlayerActive = true;
         }
         else
@@ -44,8 +44,15 @@ public class PlayerUIController : MonoBehaviour {
                 RespawnText.enabled = true;
                 Crosshair.SetActive(false);
             }
-            RespawnText.text = "Respawning in " + (LifeSys.playerLifeSystem.nextSpawnTime - System.DateTime.Now).TotalSeconds.ToString("F1");
+            RespawnText.text = "Respawning in " + (CharacterLifeSystems.LocalPlayer.nextSpawnTime - System.DateTime.Now).TotalSeconds.ToString("F1");
             IsPlayerActive = false;
+        }
+
+        if(Input.GetButtonDown("MultiPlayerMenu"))
+        {
+        }
+        if(Input.GetButtonUp("MultiPlayerMenu"))
+        {
         }
     }
 }
