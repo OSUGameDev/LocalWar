@@ -22,7 +22,10 @@ public class CharacterLifeSystems : LifeSys
         if (hasAuthority)
         {
             LocalPlayer = this;
-            CmdAddToPlayersList("rickst");
+
+
+            
+            CmdAddToPlayersList(MainMenuSettings.primary.username);
             base.Kill(new DateTime(0));
         }
     }
@@ -44,6 +47,10 @@ public class CharacterLifeSystems : LifeSys
         if(info == null)
             return base.getSpawnLocation();
         var possibleLocations = GameObject.FindObjectsOfType<TeamNetworkStartPosition>().Where(item => item.team == info.Team);
+        if(possibleLocations.Count() <= 0)
+        {
+            return base.getSpawnLocation();
+        }
         System.Random rand = new System.Random();
         return possibleLocations.ElementAt(rand.Next(possibleLocations.Count())).transform;
     }
@@ -104,9 +111,12 @@ public class CharacterLifeSystems : LifeSys
         if (team != info.Team)
         {
             info.Team = team;
-            info.Deaths -= 1;
-            lastAttacker = null;
-            Kill();
+            if (this.isAlive)
+            {
+                info.Deaths -= 1;
+                lastAttacker = null;
+                Kill();
+            }
         }
     }
 

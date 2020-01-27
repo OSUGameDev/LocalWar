@@ -57,11 +57,13 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
 
     public DateTime nextSpawnTime;
 
-
+    private bool pIsAlive;
+    public bool isAlive => pIsAlive;
 
     [ClientRpc]
     protected virtual void RpcKill()
     {
+        pIsAlive = false;
         nextSpawnTime = DateTime.Now + respawnTime;
         gameObject.SetActive(false);
         if(hasAuthority)
@@ -85,6 +87,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     [ClientRpc]
     private void RpcSpawn()
     {
+        pIsAlive = true;
         if (hasAuthority)
         {
             var spawnPos = getSpawnLocation();
@@ -109,6 +112,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     [Server]
     public virtual void Kill()
     {
+        pIsAlive = false;
         gameObject.SetActive(false);
         RpcKill();
         RespawnManager.singleton.QueueRespawn(respawnTime, this);
@@ -117,6 +121,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     [Server]
     public virtual void Kill(DateTime overrideRespawnTime)
     {
+        pIsAlive = false;
         gameObject.SetActive(false);
         RpcKill();
         RespawnManager.singleton.QueueRespawn(overrideRespawnTime, this);
@@ -139,6 +144,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     [Server]
     public void Spawn(int health, int shield)
     {
+        pIsAlive = true;
         _health = health;
         _shield = shield;
         RpcSpawn();
