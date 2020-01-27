@@ -218,6 +218,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1893988260969572, guid: 3c2d87f6be29d6f4693e2ae2875ea147, type: 3}
+      propertyPath: m_Name
+      value: MainMenuCanvas
+      objectReference: {fileID: 0}
     - target: {fileID: 224352628373529514, guid: 3c2d87f6be29d6f4693e2ae2875ea147,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -257,6 +261,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224352628373529514, guid: 3c2d87f6be29d6f4693e2ae2875ea147,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224352628373529514, guid: 3c2d87f6be29d6f4693e2ae2875ea147,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224352628373529514, guid: 3c2d87f6be29d6f4693e2ae2875ea147,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224352628373529514, guid: 3c2d87f6be29d6f4693e2ae2875ea147,
         type: 3}
@@ -307,6 +326,10 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1636498269624554, guid: 3c2d87f6be29d6f4693e2ae2875ea147, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c2d87f6be29d6f4693e2ae2875ea147, type: 3}
