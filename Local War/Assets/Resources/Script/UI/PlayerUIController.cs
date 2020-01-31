@@ -10,6 +10,7 @@ public class PlayerUIController : MonoBehaviour {
     public Text ShieldText;
     public Text RespawnText;
     public GameObject Crosshair;
+    public bool isNetworkDebug = false;
     private bool IsPlayerActive = true;
     public bool ShowMultiPlayerUI;
     public GameObject MultiplayerRowPrefab;
@@ -27,6 +28,8 @@ public class PlayerUIController : MonoBehaviour {
         {
             GameObject.DestroyImmediate(MultiplayerMenu.transform.GetChild(0).GetChild(i-1).gameObject);
         }
+        MultiplayerMenu.transform.GetChild(0).GetChild(0).GetChild(4).gameObject.SetActive(isNetworkDebug);
+
         foreach (var playerInfo in SessionInformationManager.Players.getPlayers())
         {
             var newRow = GameObject.Instantiate(MultiplayerRowPrefab, MultiplayerMenu.transform.GetChild(0));
@@ -35,6 +38,7 @@ public class PlayerUIController : MonoBehaviour {
             newRow.transform.GetChild(2).GetComponent<Text>().text = playerInfo.Deaths.ToString();
             newRow.transform.GetChild(3).GetComponent<Text>().text = playerInfo.Team.ToString();
             newRow.transform.GetChild(4).GetComponent<Text>().text = playerInfo.HashCode.ToString();
+            newRow.transform.GetChild(4).gameObject.SetActive(isNetworkDebug); 
         }
     }
 
