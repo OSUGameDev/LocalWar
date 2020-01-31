@@ -67,7 +67,7 @@ MonoBehaviour:
   m_SpawnPrefabs:
   - {fileID: 1269019765647858, guid: c7717bc8d0fc6164a915eac90bea5c4d, type: 3}
   m_CustomConfig: 1
-  m_MaxConnections: 4
+  m_MaxConnections: 16
   m_ConnectionConfig:
     m_PacketSize: 1440
     m_FragmentSize: 500
@@ -118,7 +118,7 @@ MonoBehaviour:
   m_MatchHost: mm.unet.unity3d.com
   m_MatchPort: 443
   matchName: default
-  matchSize: 4
+  matchSize: 16
   isNetworkActive: 0
   matchMaker: {fileID: 0}
 --- !u!114 &114177895957759606

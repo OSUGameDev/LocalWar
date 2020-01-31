@@ -682,7 +682,7 @@ MonoBehaviour:
   ShieldText: {fileID: 114405087527405308}
   RespawnText: {fileID: 114030920735232376}
   Crosshair: {fileID: 1920238197540214}
-  isNetworkDebug: 0
+  isNetworkDebug: 1
   ShowMultiPlayerUI: 0
   MultiplayerRowPrefab: {fileID: 6281126502074892887, guid: a0f6ece1c8d3b3f48bfa53e32afc7e86,
     type: 3}
