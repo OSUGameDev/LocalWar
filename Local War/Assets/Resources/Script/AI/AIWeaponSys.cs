@@ -14,7 +14,13 @@ public class AIWeaponSys : MonoBehaviour
     //Movement systems and AI movement systems similar
     // - adapt WeaponSys to AI WeaponSys
 
+    // The target marker.
+    public Transform target;
+    // Angular speed in radians per sec.
+    public float speed = 1.0f;
     private int currentWeaponPos;
+
+    private AstarPathfinding controller;
   
     private GameObject weaponList;
     private GameObject currentWeapon;
@@ -26,6 +32,7 @@ public class AIWeaponSys : MonoBehaviour
     
     void Start()
     {
+        controller = GetComponent<AstarPathfinding>();
         isShooting = false;
         coolDown = 1;
 
@@ -41,6 +48,22 @@ public class AIWeaponSys : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        target = controller.TargetPosition;
+        // Determine which direction to rotate towards
+        Vector3 targetDirection = target.position - transform.position;
+
+        // The step size is equal to speed times frame time.
+        float singleStep = speed * Time.deltaTime;
+
+        // Rotate the forward vector towards the target direction by one step
+        Vector3 newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
+
+        // Draw a ray pointing at our target in
+        //Debug.DrawRay(transform.position, newDirection, Color.red);
+
+        // Calculate a rotation a step closer to the target and applies rotation to this object
+        transform.rotation = Quaternion.LookRotation(newDirection);
+
         //Check if the AI is shooting
         if(isShooting)
         {
@@ -59,11 +82,12 @@ public class AIWeaponSys : MonoBehaviour
             }
 
         }
+
     }
 
     void FireRange() {
 
-        transform.Rotate(0, 10, 0);
+        //transform.Rotate(0, 10, 0);
         //Vector3.RotateTowards(transform.forward, Camera.main.transform.position, 100 * Time.deltaTime, 0.0f);
 
         //Ray cast and find the fire point
@@ -79,7 +103,7 @@ public class AIWeaponSys : MonoBehaviour
             laser.initialize(hit.point, true);
             isShooting = true;
             coolDownCounter = coolDown;
-        }
+        } 
 
     }
 }
