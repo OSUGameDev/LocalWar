@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[Serializable]
 public class LifeSys : NetworkBehaviour, ISpawnable {
 
     public static LifeSys playerLifeSystem;
@@ -32,7 +33,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     /// Backend field for the <see cref="Health"/> property
     /// </summary>
     [SyncVar]
-    private float           _health;
+    [SerializeField] private float           _health;
 
     /// <summary>
     /// Shield of the entity
@@ -104,7 +105,8 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     public void Kill()
     {
         gameObject.SetActive(false);
-        RpcKill();
+        if(this.name == "Player")
+            RpcKill();
         RespawnManager.singleton.QueueRespawn(respawnTime, this);
     }
 
