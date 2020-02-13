@@ -21,7 +21,7 @@ public class MovementSys : NetworkBehaviour
     private int jump_count = 2;
     float mass = 50.0f;
     float gravity = 0.7f;
-    float jump_speed = 0.3f;
+    float jump_speed = 0.03f;
 
     private float sensitivity = 100.0f;
 
@@ -80,7 +80,6 @@ public class MovementSys : NetworkBehaviour
     {
 		if (kinematic_controller.isGrounded) {
 			jumps_used = 0;
-			player_velocity.y = 0;
 		}
 
         // jumping:
