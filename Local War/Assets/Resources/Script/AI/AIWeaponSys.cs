@@ -87,9 +87,6 @@ public class AIWeaponSys : MonoBehaviour
 
     void FireRange() {
 
-        //transform.Rotate(0, 10, 0);
-        //Vector3.RotateTowards(transform.forward, Camera.main.transform.position, 100 * Time.deltaTime, 0.0f);
-
         //Ray cast and find the fire point
         RaycastHit hit;
         bool ray = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit);
@@ -97,10 +94,13 @@ public class AIWeaponSys : MonoBehaviour
         //If the ray hit something, fires a bullet and sets values to ensure that the player cannot constantly fire.
         if (ray)
         {
+            float rand = Random.Range(0.0f, 0.25f);
+            Vector3 path = new Vector3(hit.point.x + rand, hit.point.y, hit.point.z + rand);
+
             GameObject bullet = Instantiate(ammoType, transform.position, transform.rotation);
             LaserAmmo laser = bullet.GetComponent<LaserAmmo>();
             laser.setOrigin(transform.position);
-            laser.initialize(hit.point, true);
+            laser.initialize(path, true);
             isShooting = true;
             coolDownCounter = coolDown;
         } 
