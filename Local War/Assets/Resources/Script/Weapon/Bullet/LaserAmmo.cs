@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LaserAmmo : Ammo {
+public class LaserAmmo : Ammo
+{
 
-    public      float           maxRadius;
+    public float maxRadius;
 
-    private     float           angle;
-    private     Vector3         destination;
-    private     LineRenderer    line;
+    private float angle;
+    private Vector3 destination;
+    private LineRenderer line;
 
-    public void initialize(Vector3 direction, bool isServer)
+    public void initialize(Vector3 direction, bool isServer, int playerHashCode)
     {
         damage = 15.0f;
 
@@ -31,12 +32,12 @@ public class LaserAmmo : Ammo {
             if (target != null)
             {
                 Debug.Log(maxRadius);
-                target.InflictDamage(damage);
+                target.InflictDamage(damage, playerHashCode);
             }
         }
     }
 
-    void Start ()
+    void Start()
     {
         line.startWidth = 0;
         line.endWidth = 0;
@@ -44,7 +45,7 @@ public class LaserAmmo : Ammo {
         maxRadius = 0.01f;
     }
 
-    void FixedUpdate ()
+    void FixedUpdate()
     {
         line.startWidth = Mathf.Sin(angle) * maxRadius;
         line.endWidth = Mathf.Sin(angle) * maxRadius;

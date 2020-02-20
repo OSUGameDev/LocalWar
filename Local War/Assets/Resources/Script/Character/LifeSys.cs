@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 public class LifeSys : NetworkBehaviour, ISpawnable {
 
-    public static LifeSys playerLifeSystem;
+    
     public TimeSpan respawnTime = new TimeSpan(0, 0, 10);
 
     /// <summary>
@@ -57,18 +57,19 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
 
     public DateTime nextSpawnTime;
 
-    //private List<Buff>      buffList;
-    //private List<Debuff>    debuffList;
-
+    private bool pIsAlive;
+    public bool isAlive => pIsAlive;
 
     [ClientRpc]
-    private void RpcKill()
+    protected virtual void RpcKill()
     {
+        pIsAlive = false;
         nextSpawnTime = DateTime.Now + respawnTime;
         gameObject.SetActive(false);
         if(hasAuthority)
         {
             GameObject.Find("RespawnCamera").GetComponent<Camera>().enabled = true;
+            GameObject.Find("RespawnCamera").GetComponent<AudioListener>().enabled = true;
         }
     }
 
@@ -78,14 +79,22 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
         gameObject.SetActive(true);
     }
 
+    protected virtual Transform getSpawnLocation()
+    {
+        return GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform;
+    }
+
     [ClientRpc]
     private void RpcSpawn()
     {
+        pIsAlive = true;
         if (hasAuthority)
         {
-            transform.position = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.position;
-            transform.rotation = GameObject.FindObjectsOfType<NetworkStartPosition>()[0].transform.rotation;
+            var spawnPos = getSpawnLocation();
+            transform.position = spawnPos.position;
+            transform.rotation = spawnPos.rotation;
             GameObject.Find("RespawnCamera").GetComponent<Camera>().enabled = false;
+            GameObject.Find("RespawnCamera").GetComponent<AudioListener>().enabled = false;
         }
         gameObject.SetActive(true);
     }
@@ -101,15 +110,25 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     }
 
     [Server]
-    public void Kill()
+    public virtual void Kill()
     {
+        pIsAlive = false;
         gameObject.SetActive(false);
         RpcKill();
         RespawnManager.singleton.QueueRespawn(respawnTime, this);
     }
 
     [Server]
-    public void InflictDamage(float dmg)
+    public virtual void Kill(DateTime overrideRespawnTime)
+    {
+        pIsAlive = false;
+        gameObject.SetActive(false);
+        RpcKill();
+        RespawnManager.singleton.QueueRespawn(overrideRespawnTime, this);
+    }
+
+    [Server]
+    public virtual void InflictDamage(float dmg, int playerHashCode)
     {
         RpcClientDamaged(dmg);
         if (shield > 0)
@@ -125,6 +144,7 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
     [Server]
     public void Spawn(int health, int shield)
     {
+        pIsAlive = true;
         _health = health;
         _shield = shield;
         RpcSpawn();
@@ -136,13 +156,11 @@ public class LifeSys : NetworkBehaviour, ISpawnable {
         Spawn(100, 100);
     }
 
-    void Start () {
+    protected virtual void Start () {
         _health = 100.0f;
         _shield = 100.0f;
-        if (hasAuthority)
-            playerLifeSystem = this;
     }
 
-	void Update () {
+	protected virtual void Update () {
 	}
 }

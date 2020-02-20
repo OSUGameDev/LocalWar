@@ -128,6 +128,8 @@ public class MovementSys : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (!hasAuthority)
+            return;
         GetInput();
         Move();
     }
