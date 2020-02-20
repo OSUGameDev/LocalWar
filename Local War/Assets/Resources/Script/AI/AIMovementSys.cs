@@ -33,9 +33,10 @@ public class AIMovementSys : MonoBehaviour{
     private Rigidbody rb;
 
     private void Awake(){//When the program start
+        roaming = true; //start off by roaming
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();// get the NavMesh agent 
-        TargetPosition = GameObject.FindGameObjectWithTag("Player").transform.position; //Debug purposes, will change later   
+        //TargetPosition = GameObject.FindGameObjectWithTag("Player").transform.position; //Debug purposes, will change later   
     }
 
     private void Update()//Every frame
