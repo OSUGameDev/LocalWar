@@ -20,7 +20,7 @@ public class AIWeaponSys : MonoBehaviour
     public float speed = 1.0f;
     private int currentWeaponPos;
 
-    private AstarPathfinding controller;
+    private AIMovementSys controller;
   
     private GameObject weaponList;
     private GameObject currentWeapon;
@@ -32,23 +32,23 @@ public class AIWeaponSys : MonoBehaviour
     
     void Start()
     {
-        controller = GetComponent<AstarPathfinding>();
+        controller = GetComponent<AIMovementSys>();
         isShooting = false;
         coolDown = 1;
 
         //Initializes the object
-        weaponList = transform.Find("Weapons").gameObject;
+        //weaponList = transform.Find("Weapons").gameObject;
 
         //Initalize the weapon
-        currentWeapon = weaponList.transform.GetChild(0).gameObject;
+        //currentWeapon = weaponList.transform.GetChild(0).gameObject;
         currentWeaponPos = 0;
 
     }
 
     // Update is called once per frame
     void Update()
-    {
-        target = controller.TargetPosition;
+    {   
+        target = GameObject.FindGameObjectWithTag("Player").transform;
         // Determine which direction to rotate towards
         Vector3 targetDirection = target.position - transform.position;
 

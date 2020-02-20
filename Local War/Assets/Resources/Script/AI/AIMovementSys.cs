@@ -19,7 +19,7 @@ public class AIMovementSys : MonoBehaviour{
     private Quaternion rotationStart, rotationEnd;
 
     [Tooltip("Transform of target")]
-    [SerializeField] private Vector3 TargetPosition;//Starting position to pathfind to
+    [SerializeField] public Vector3 TargetPosition;//Starting position to pathfind to
 
     private Vector3 LastPositon;
     private bool isPathing;
