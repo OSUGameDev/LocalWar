@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[RequireComponent(typeof(CharacterLifeSystems))]
 public class WeaponSys : NetworkBehaviour {
 
     private     int         currentWeaponPos;
     private     Camera      playerCam;
     private     GameObject  weaponList;
     private     GameObject  currentWeapon;
+    private CharacterLifeSystems currentCharacter;
 
     public void AddWeapon()
     {
@@ -36,6 +38,7 @@ public class WeaponSys : NetworkBehaviour {
         //Initialize the objects
         playerCam = transform.Find("Main Camera").GetComponent<Camera>();
         weaponList = transform.Find("Weapons").gameObject;
+        currentCharacter = this.GetComponent<CharacterLifeSystems>();
 
         //Initialize the weapon
         currentWeapon = weaponList.transform.GetChild(0).gameObject;
@@ -70,7 +73,7 @@ public class WeaponSys : NetworkBehaviour {
 
         //Set the camera then perform attack
         script.SetCamera(playerCam);
-        script.Fire(isServer);
+        script.Fire(isServer, currentCharacter.info.HashCode);
     }
 
 }
