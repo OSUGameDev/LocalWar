@@ -22,8 +22,10 @@ public class MovementSys : NetworkBehaviour
     public float gravity = 0.7f;
     public float jump_speed = 0.3f;
 
+    public const float SPRINTING_MULTIPLIER = 3f;
+    private bool is_sprinting = false;
+
     private float sensitivity = 100.0f;
-    private float player_height; //set on init.
 
     private CharacterController kinematic_controller;
 
@@ -33,7 +35,6 @@ public class MovementSys : NetworkBehaviour
         player_acceleration = new Vector3();
         input_direction     = new Vector2();
         mouse_axis          = new Vector2();
-        player_height       = this.gameObject.GetComponent<Renderer>().bounds.size.y; //need this to calculate bottom bounds of the player's model. 
 
         kinematic_controller = GetComponent<CharacterController>();
         transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
@@ -75,6 +76,15 @@ public class MovementSys : NetworkBehaviour
             }
             player_velocity.y += jump_speed;
         }
+
+        //sprinting
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            is_sprinting = true;
+        }else
+        {
+            is_sprinting = false;
+        }
     }
 
     private void Move()
@@ -82,6 +92,11 @@ public class MovementSys : NetworkBehaviour
         // movement:
         // acceleration
         Vector3 acceleration = force / mass;
+        if(is_sprinting)
+        {
+            acceleration *= SPRINTING_MULTIPLIER;
+        }
+
 
         // strafing
         if ( input_direction.x != 0.0f )
