@@ -123,6 +123,14 @@ public class MovementSys : NetworkBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             NetworkManager.singleton.StopClient();
+            try
+            {
+                NetworkManager.singleton.StopServer();
+            }
+            catch
+            {
+
+            }
         }
     }
 

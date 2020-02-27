@@ -31,7 +31,6 @@ public class LaserAmmo : Ammo
             LifeSys target = hit.collider.gameObject.GetComponent<LifeSys>();
             if (target != null)
             {
-                Debug.Log(maxRadius);
                 target.InflictDamage(damage, playerHashCode);
             }
         }

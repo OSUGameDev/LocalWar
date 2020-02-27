@@ -40,3 +40,6 @@ Builds/*
 
 # MAC DS_Store files
 *.DS_Store
+
+# Per Player Settings Files
+MainMenuSettings.xml
