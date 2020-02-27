@@ -231,11 +231,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a43ef5017a6e5be42a9a23e9dd4bcdfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: {x: 0, y: 0, z: 0}
-  kinetic_friction: 0
-  air_friction: 0
-  sensitivity: 100
-  jump_count: 2
 --- !u!114 &114788496790337474
 MonoBehaviour:
   m_ObjectHideFlags: 0

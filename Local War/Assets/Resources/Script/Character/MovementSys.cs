@@ -17,11 +17,13 @@ public class MovementSys : NetworkBehaviour
     private float air_friction = 0.01f;
     private int jumps_used = 0;
     private int jump_count = 2;
-    float mass = 50.0f;
-    float gravity = 0.7f;
-    float jump_speed = 0.3f;
+   
+    public float mass = 50.0f;
+    public float gravity = 0.7f;
+    public float jump_speed = 0.3f;
 
     private float sensitivity = 100.0f;
+    private float player_height; //set on init.
 
     private CharacterController kinematic_controller;
 
@@ -31,6 +33,7 @@ public class MovementSys : NetworkBehaviour
         player_acceleration = new Vector3();
         input_direction     = new Vector2();
         mouse_axis          = new Vector2();
+        player_height       = this.gameObject.GetComponent<Renderer>().bounds.size.y; //need this to calculate bottom bounds of the player's model. 
 
         kinematic_controller = GetComponent<CharacterController>();
         transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
@@ -62,11 +65,6 @@ public class MovementSys : NetworkBehaviour
         input_direction.z = Input.GetAxis("Vertical");
 
         // jumping:
-        if (kinematic_controller.isGrounded)
-        {
-            jumps_used = 0;
-            player_velocity.y = 0;
-        }
         if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
         {
             jumps_used++;
@@ -138,6 +136,12 @@ public class MovementSys : NetworkBehaviour
             return;
 
         Move();
+
+        if (kinematic_controller.isGrounded) //needs to run in fixed update, our isGrounded is unreliable.
+        {
+            jumps_used = 0;
+            player_velocity.y = 0;
+        }
     }
 
     private int signf( float val )
