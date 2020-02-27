@@ -22,7 +22,11 @@ public static class SoundSys {
             oneAudioSource = oneSoundGameObject.AddComponent<AudioSource>();
         }
 
-        oneAudioSource.PlayOneShot(sound, vol);
+        if (sound != null)
+        {
+            oneAudioSource.PlayOneShot(sound, vol);
+        }
+
 
     }
 

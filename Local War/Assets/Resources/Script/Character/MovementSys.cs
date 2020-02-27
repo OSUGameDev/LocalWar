@@ -7,28 +7,30 @@ public class MovementSys : NetworkBehaviour
 {
     private Vector3 player_velocity;
     private Vector3 player_acceleration;
-    public Vector3  acceleration;
-    public float    kinetic_friction;
-    public float    air_friction;
     private Vector3 previous_input_direction;
     private Vector3 input_direction;
     private Vector2 previous_mouse_axis;
     private Vector2 mouse_axis;
-    public float sensitivity = 100.0f;
+
+    private Vector3 force = new Vector3(18.0f, 0.0f, 18.0f);
+    private float kinetic_friction = 0.12f;
+    private float air_friction = 0.01f;
+    private int jumps_used = 0;
+    private int jump_count = 2;
+   
+    public float mass = 50.0f;
+    public float gravity = 0.7f;
+    public float jump_speed = 0.3f;
+
+    public const float SPRINTING_MULTIPLIER = 3f;
+    private bool is_sprinting = false;
+
+    private float sensitivity = 100.0f;
 
     private CharacterController kinematic_controller;
 
-    private int jumps_used = 0;
-    public int jump_count = 2;
-    float gravity = 0.7f;
-    float jump_speed = 0.3f;
-
     void Start()
     {
-        acceleration        = new Vector3(1.8f, 0.0f, 1.8f);
-        kinetic_friction    = 0.35f;
-        air_friction        = 0.01f;
-
         player_velocity     = new Vector3();
         player_acceleration = new Vector3();
         input_direction     = new Vector2();
@@ -62,42 +64,57 @@ public class MovementSys : NetworkBehaviour
         input_direction.x = Input.GetAxis("Horizontal");
         input_direction.y = 0.0f;
         input_direction.z = Input.GetAxis("Vertical");
-    }
-
-    private void Move()
-    {
-		if (kinematic_controller.isGrounded) {
-			jumps_used = 0;
-			player_velocity.y = 0;
-		}
 
         // jumping:
-		if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
+        if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
         {
-			jumps_used++;
+            jumps_used++;
             // zero out jump velocity if falling
-            if(player_velocity.y < 0.0f)
+            if (player_velocity.y < 0.0f)
             {
                 player_velocity.y = 0.0f;
             }
             player_velocity.y += jump_speed;
         }
 
+        //sprinting
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            is_sprinting = true;
+        }else
+        {
+            is_sprinting = false;
+        }
+    }
+
+    private void Move()
+    {
         // movement:
+        // acceleration
+        Vector3 acceleration = force / mass;
+        if(is_sprinting)
+        {
+            acceleration *= SPRINTING_MULTIPLIER;
+        }
+
 
         // strafing
         if ( input_direction.x != 0.0f )
         {
+            // get vector math
             Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
             Vector3 movement_cross = Vector3.Cross(movement_forward, Vector3.up);
-            player_velocity -= movement_cross * acceleration.x * input_direction.x * Time.deltaTime;
+            // apply input direction
+            player_velocity = player_velocity - ( movement_cross * ( input_direction.x * acceleration.x * Time.deltaTime ) );
         }
 
         // forward/backwards
         if (input_direction.z != 0.0f)
         {
+            // get vector math
             Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
-            player_velocity += movement_forward * acceleration.z * input_direction.z * Time.deltaTime;
+            // apply input direction
+            player_velocity = player_velocity + ( movement_forward * ( input_direction.z * acceleration.z * Time.deltaTime ) );
         }
 
         // friction
@@ -124,14 +141,22 @@ public class MovementSys : NetworkBehaviour
             Cursor.visible = true;
             NetworkManager.singleton.StopClient();
         }
+
+        GetInput();
     }
 
     private void FixedUpdate()
     {
         if (!hasAuthority)
             return;
-        GetInput();
+
         Move();
+
+        if (kinematic_controller.isGrounded) //needs to run in fixed update, our isGrounded is unreliable.
+        {
+            jumps_used = 0;
+            player_velocity.y = 0;
+        }
     }
 
     private int signf( float val )
