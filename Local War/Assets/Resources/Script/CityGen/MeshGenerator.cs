@@ -112,7 +112,7 @@ public class MeshGenerator : NetworkBehaviour
 					}
 
 					// Prevent overlap
-					Debug.Log("k: " + k + " row: " + row + " bs0:" + buildingSize[0] + " bs1:" + buildingSize[1] + " logicX: " + (k + (row + buildingSize[0] - 1) * mapGenSettings.blockSize) + " LogicZ: " + (k + buildingSize[1] - 1 + row * mapGenSettings.blockSize));
+					//Debug.Log("k: " + k + " row: " + row + " bs0:" + buildingSize[0] + " bs1:" + buildingSize[1] + " logicX: " + (k + (row + buildingSize[0] - 1) * mapGenSettings.blockSize) + " LogicZ: " + (k + buildingSize[1] - 1 + row * mapGenSettings.blockSize));
 
 					for (int r = buildingSize[0] - 1; r > 0; r--) 
 					{
