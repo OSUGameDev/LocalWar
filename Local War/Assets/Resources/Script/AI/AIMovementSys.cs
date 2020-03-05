@@ -41,6 +41,7 @@ public class AIMovementSys : MonoBehaviour{
 
     private void Update()//Every frame
     {
+        DistancingFromEnemy();
         Roam();
         LastPositon = transform.position;
         Vector3 temp = transform.position;
@@ -107,4 +108,48 @@ public class AIMovementSys : MonoBehaviour{
         return newPos;
     }
 
+    //Experiment with adding Distancing - Potentially move
+    public void DistancingFromEnemy() {
+        if (CheckEnemy()) {
+            roaming = false;
+            Vector3 target = GetNearbyVector();
+            Vector3 newTargetPos = new Vector3(transform.position.x - target.x, transform.position.y - target.y, transform.position.z - target.z);
+            SetNewTarget(newTargetPos/*Vector3.MoveTowards(transform.position, target, -1 * speed * Time.deltaTime * 3)*/);
+        }
+        else {
+            roaming = true;
+        }
+
+    }
+
+    private bool CheckEnemy() {
+        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, 2);
+        for (int i = 0; i < nearbyObjects.Length; i++) {
+            if (nearbyObjects[i].GetComponentInParent<LifeSys>() != null &&
+                nearbyObjects[i].ClosestPoint(transform.position) != transform.position) {
+                //Check to see if Player is on opposite team
+                if (true) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Vector3 GetNearbyVector() {
+        Vector3 enemyPos = transform.position;
+        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, 2);
+        for (int i = 0; i < nearbyObjects.Length; i++) {
+            if (nearbyObjects[i].GetComponentInParent<LifeSys>() != null &&
+                nearbyObjects[i].ClosestPoint(transform.position) != transform.position) {
+                //Check to see if Player is on opposite team
+                if (true) {
+                    enemyPos = nearbyObjects[i].ClosestPoint(transform.position);
+                    break;
+                }
+            }
+
+        }
+        return enemyPos;
+    }
 }
