@@ -7,23 +7,23 @@ public class MovementSys : NetworkBehaviour
 {
     private Vector3 player_velocity;
     private Vector3 player_acceleration;
+    private Vector3 max_player_velocity;
+    private Vector3 constant_acceleration;
     private Vector3 previous_input_direction;
     private Vector3 input_direction;
     private Vector2 previous_mouse_axis;
     private Vector2 mouse_axis;
 
-    private Vector3 force = new Vector3(18.0f, 0.0f, 18.0f);
-    private float kinetic_friction = 0.12f;
-    private float air_friction = 0.01f;
+    private Vector3 force = new Vector3(120.0f, 0.0f, 120.0f);
+    private float kinetic_friction_constant = 0.12f;
+    private float air_friction = 0.001f;
     private int jumps_used = 0;
     private int jump_count = 2;
-   
-    public float mass = 50.0f;
-    public float gravity = 0.7f;
-    public float jump_speed = 0.3f;
-
-    public const float SPRINTING_MULTIPLIER = 3f;
-    private bool is_sprinting = false;
+    float mass = 50.0f;
+    float gravity = 0.7f;
+    float jump_speed = 0.03f;
+    bool grounded = false;
+    bool jump_flag = false;
 
     private float sensitivity = 100.0f;
 
@@ -33,8 +33,10 @@ public class MovementSys : NetworkBehaviour
     {
         player_velocity     = new Vector3();
         player_acceleration = new Vector3();
+        constant_acceleration = new Vector3();
         input_direction     = new Vector2();
         mouse_axis          = new Vector2();
+        set_max_player_velocity(new Vector3(0.05f, 0.0f, 0.05f));
 
         kinematic_controller = GetComponent<CharacterController>();
         transform.Find("Main Camera").GetComponent<Camera>().enabled = hasAuthority;
@@ -65,38 +67,48 @@ public class MovementSys : NetworkBehaviour
         input_direction.y = 0.0f;
         input_direction.z = Input.GetAxis("Vertical");
 
-        // jumping:
-        if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
-        {
-            jumps_used++;
-            // zero out jump velocity if falling
-            if (player_velocity.y < 0.0f)
-            {
-                player_velocity.y = 0.0f;
-            }
-            player_velocity.y += jump_speed;
-        }
-
         //sprinting
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            is_sprinting = true;
-        }else
+            set_max_player_velocity(new Vector3(0.3f, 0.0f, 0.3f));
+        }
+        else
         {
-            is_sprinting = false;
+            set_max_player_velocity(new Vector3(0.05f, 0.0f, 0.05f));
+        }
+
+        // jumping:
+        if (jumps_used < jump_count && Input.GetButtonDown("Jump"))
+        {
+            jump_flag = true;
         }
     }
 
     private void Move()
     {
-        // movement:
-        // acceleration
-        Vector3 acceleration = force / mass;
-        if(is_sprinting)
+        // grounding:
+        if (kinematic_controller.isGrounded)
         {
-            acceleration *= SPRINTING_MULTIPLIER;
+            grounded = true;
+            jumps_used = 0;
+            player_velocity.y = 0.0f;
+        }
+        else
+        {
+            grounded = false;
         }
 
+        // jumping:
+        if(jumps_used < jump_count && jump_flag)
+        {
+            // set meta
+            jump_flag = false;
+            jumps_used++;
+            player_velocity.y = 0.0f;
+            apply_impulse(new Vector3(0.0f, jump_speed, 0.0f), 60.0f);
+        }
+
+        // movement:
 
         // strafing
         if ( input_direction.x != 0.0f )
@@ -105,7 +117,7 @@ public class MovementSys : NetworkBehaviour
             Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
             Vector3 movement_cross = Vector3.Cross(movement_forward, Vector3.up);
             // apply input direction
-            player_velocity = player_velocity - ( movement_cross * ( input_direction.x * acceleration.x * Time.deltaTime ) );
+            player_velocity = player_velocity - ( movement_cross * ( input_direction.x * constant_acceleration.x * Time.deltaTime ) );
         }
 
         // forward/backwards
@@ -114,20 +126,63 @@ public class MovementSys : NetworkBehaviour
             // get vector math
             Vector3 movement_forward = new Vector3(transform.forward.x, 0.0f, transform.forward.z); movement_forward.Normalize();
             // apply input direction
-            player_velocity = player_velocity + ( movement_forward * ( input_direction.z * acceleration.z * Time.deltaTime ) );
+            player_velocity = player_velocity + ( movement_forward * ( input_direction.z * constant_acceleration.z * Time.deltaTime ) );
         }
 
         // friction
-        Vector3 friction = new Vector3(-player_velocity.x * kinetic_friction, 
-                                       -player_velocity.y * air_friction, 
-                                       -player_velocity.z * kinetic_friction);
-        player_velocity += friction;
+        Vector3 friction_velocity = new Vector3(-player_velocity.x * kinetic_friction_constant,
+                                                -player_velocity.y * air_friction, 
+                                                -player_velocity.z * kinetic_friction_constant);
+        player_velocity += friction_velocity;
 
         // gravity
         player_velocity.y -= gravity * Time.deltaTime;
 
         // apply movement
         kinematic_controller.Move(player_velocity);
+    }
+
+    public void set_max_player_velocity( Vector3 new_vel )
+    {
+        // update max velocity
+        max_player_velocity = new_vel;
+        // update force/acceleration
+        force = max_player_velocity * mass / (Time.deltaTime * (1.0f / kinetic_friction_constant - 1.0f));
+        constant_acceleration = force / mass;
+    }
+
+    public void set_mass( float new_mass )
+    {
+        // update mass
+        mass = new_mass;
+        // update force/acceleration
+        force = max_player_velocity * mass / (Time.deltaTime * (1.0f / kinetic_friction_constant - 1.0f));
+        constant_acceleration = force / mass;
+    }
+
+    public void set_force( Vector3 new_force )
+    {
+        // update force/acceleration
+        force = new_force;
+        constant_acceleration = force / mass;
+        // update max velocity
+        max_player_velocity = constant_acceleration * Time.deltaTime * (1.0f / kinetic_friction_constant - 1.0f);
+    }
+
+    public void set_kinetic_friction( float new_frict )
+    {
+        // set new frict
+        kinetic_friction_constant = new_frict;
+        // update force/acceleration
+        force = max_player_velocity * mass / (Time.deltaTime * (1.0f / kinetic_friction_constant - 1.0f));
+        constant_acceleration = force / mass;
+    }
+
+    public void apply_impulse(Vector3 velocity, float impulse_mass)
+    {
+        const float impulse_time = 0.1f;
+        Vector3 impulse_force = velocity * impulse_mass / impulse_time;
+        player_velocity += impulse_force / mass;
     }
 
     void Update()
@@ -151,12 +206,6 @@ public class MovementSys : NetworkBehaviour
             return;
 
         Move();
-
-        if (kinematic_controller.isGrounded) //needs to run in fixed update, our isGrounded is unreliable.
-        {
-            jumps_used = 0;
-            player_velocity.y = 0;
-        }
     }
 
     private int signf( float val )
